@@ -16,16 +16,18 @@ namespace NovelTextProcessor
         public void Process(string text, EntityName[] entityNames) 
         {
             _novelText.Append(text);
+            _entityNames = entityNames;
 
-            ExtractEntityNamesAndSpans(entityNames);
+            DocumentProcessing();
             GenerateArrayOfSpanWithEntityNamesFromString();
-            ReplaceAllEntityNamesToStaticNames();
+            ReplaceAllEntityNamesToStaticNames("Oliver","Maria");
+            //TDO translate and return Entity names to original one after translate using same method : ReplaceAllEntityNamesToStaticNames
+            ConvertSpansToNormalText();
         }
 
-        private void ExtractEntityNamesAndSpans(EntityName[] entityNames)
+        private void DocumentProcessing()
         {
             DocumentProcessor documentProcessor = new DocumentProcessor(_novelText.ToString().Trim());
-            _entityNames = entityNames;
             _document = documentProcessor.document;
         }
 
@@ -41,9 +43,15 @@ namespace NovelTextProcessor
 
         private SpanWithEntityNames GenerateSpanWithEntityNamesFromString(string text)
         {
+            var indexOfText = _document.TokenizedValue().IndexOf(text);
             var spanWithEntityNames = new SpanWithEntityNames()
             {
                 Span = text,
+                IndexOfOriginalText = new() 
+                {
+                    From = indexOfText,
+                    To = indexOfText + text.Length
+                }
             };
 
             for (int i = 0; i < _entityNames.Length; i++)
@@ -56,7 +64,7 @@ namespace NovelTextProcessor
             return spanWithEntityNames;
         }
 
-        private void ReplaceAllEntityNamesToStaticNames()
+        private void ReplaceAllEntityNamesToStaticNames(string maleName,string femaleName)
         {
             for (int i = 0; i < _arrayOfspanWithEntityNames.Count; i++)
             {
@@ -64,30 +72,26 @@ namespace NovelTextProcessor
                 {
                     if (_arrayOfspanWithEntityNames[i].EntityNames[t].Gender == 'M')
                     {
-                        _arrayOfspanWithEntityNames[i].Span = _arrayOfspanWithEntityNames[i].Span.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].Name, "Oliver");
+                        _arrayOfspanWithEntityNames[i].Span = _arrayOfspanWithEntityNames[i].Span.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].Name, maleName);
                     }
                     else
                     {
-                        _arrayOfspanWithEntityNames[i].Span = _arrayOfspanWithEntityNames[i].Span.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].Name, "Maria");
+                        _arrayOfspanWithEntityNames[i].Span = _arrayOfspanWithEntityNames[i].Span.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].Name, femaleName);
                     }
                 }
             }
         }
 
-        //private int CheckHowMuchEntityNamesInString(string text)
-        //{
-        //    if (string.IsNullOrEmpty(text)) return 0;
+        private string ConvertSpansToNormalText()
+        {
+            StringBuilder sb = new StringBuilder();
 
-        //    int counter = 0;
+            foreach (var item in _arrayOfspanWithEntityNames)
+            {
+                sb.AppendLine(item.Span);
+            }
+            return sb.ToString();
+        }
 
-        //    for (int i = 0; i < entityNames.Length; i++) 
-        //    {
-        //        if (text.Contains(entityNames[i]))
-        //        {
-        //            counter++;
-        //        }
-        //    }
-        //    return counter;
-        //}
     }
 }
