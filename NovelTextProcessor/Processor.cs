@@ -8,26 +8,27 @@ namespace NovelTextProcessor
 {
     public class Processor
     {
-        StringBuilder _novelText = new StringBuilder();
+        string _novelText;
         EntityName[] _entityNames = Array.Empty<EntityName>();
         Document _document = null!;
         List<SpanWithEntityNames> _arrayOfspanWithEntityNames = null!;
 
-        public void Process(string text, EntityName[] entityNames) 
+
+        public Processor(string text, EntityName[] entityNames)
         {
-            _novelText.Append(text);
+            _novelText = text;
             _entityNames = entityNames;
 
             DocumentProcessing();
             GenerateArrayOfSpanWithEntityNamesFromString();
-            ReplaceAllEntityNamesToStaticNames("Oliver","Maria");
+            ReplaceAllEntityNamesToStaticNames("Oliver", "Maria");
             //TDO translate and return Entity names to original one after translate using same method : ReplaceAllEntityNamesToStaticNames
             ConvertSpansToNormalText();
         }
 
         private void DocumentProcessing()
         {
-            DocumentProcessor documentProcessor = new DocumentProcessor(_novelText.ToString().Trim());
+            DocumentProcessor documentProcessor = new DocumentProcessor(_novelText.Trim());
             _document = documentProcessor.document;
         }
 
@@ -82,7 +83,7 @@ namespace NovelTextProcessor
             }
         }
 
-        private string ConvertSpansToNormalText()
+        private string ConvertSpansToNormalText() //TDO Edit all method to fix format to bycome same format of original document
         {
             StringBuilder sb = new StringBuilder();
 

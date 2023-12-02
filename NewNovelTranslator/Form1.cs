@@ -21,7 +21,6 @@ namespace NewNovelTranslator
             //    var test = span.TokenizedValue;
             //}
 
-            Processor processor = new Processor();
 
             var seedData = new List<EntityName>
             {
@@ -46,7 +45,7 @@ namespace NewNovelTranslator
                 //new EntityName { Name = "Steven", Gender = 'M' },
             };
 
-            processor.Process(text.Text, seedData.ToArray());
+            Processor processor = new Processor(text.Text, seedData.ToArray());
 
             MessageBox.Show("");
 

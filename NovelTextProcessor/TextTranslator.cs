@@ -33,7 +33,7 @@ namespace NovelTextProcessor
             var timeTicks = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var verifyToken = $"webkey_E3sTuMjpP8Jez49GcYpDVH7r#{timeTicks}#{Text}";
 
-            var hash = MD5Helper.NewMD5(verifyToken);
+            var verifyTokenAsMd5Hash = MD5Helper.NewMD5(verifyToken);
 
             var requestBody = new TranslationRequestDto
             {
@@ -43,7 +43,7 @@ namespace NovelTextProcessor
                 q = Text,
                 hints = "",
                 ts = timeTicks,
-                verify = hash
+                verify = verifyTokenAsMd5Hash
             };
 
             string jsonString = JsonSerializer.Serialize(requestBody);
