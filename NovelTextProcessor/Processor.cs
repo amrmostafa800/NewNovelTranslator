@@ -12,7 +12,7 @@ namespace NovelTextProcessor
         EntityName[] _entityNames = Array.Empty<EntityName>();
         Document _document = null!;
         List<SpanWithEntityNames> _arrayOfspanWithEntityNames;
-        List<SpanWithEntityNames> _arrayOfTranslatedspanWithEntityNames;
+        //List<SpanWithEntityNames> _arrayOfTranslatedspanWithEntityNames;
 
 
         public Processor(string text, EntityName[] entityNames)
@@ -20,7 +20,7 @@ namespace NovelTextProcessor
             _novelText = text;
             _entityNames = entityNames;
             _arrayOfspanWithEntityNames = new List<SpanWithEntityNames>();
-            _arrayOfTranslatedspanWithEntityNames = new List<SpanWithEntityNames>();
+            //_arrayOfTranslatedspanWithEntityNames = new List<SpanWithEntityNames>();
 
             DocumentProcessing();
             GenerateArrayOfSpanWithEntityNamesFromString();
@@ -48,7 +48,7 @@ namespace NovelTextProcessor
             var indexOfText = _document.TokenizedValue().IndexOf(text);
             var spanWithEntityNames = new SpanWithEntityNames()
             {
-                Span = text,
+                EnglishSpan = text,
                 IndexOfOriginalText = new() 
                 {
                     From = indexOfText,
@@ -74,29 +74,29 @@ namespace NovelTextProcessor
                 {
                     if (_arrayOfspanWithEntityNames[i].EntityNames[t].Gender == 'M')
                     {
-                        _arrayOfspanWithEntityNames[i].Span = _arrayOfspanWithEntityNames[i].Span.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].EnglishName, maleName);
+                        _arrayOfspanWithEntityNames[i].EnglishSpan = _arrayOfspanWithEntityNames[i].EnglishSpan.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].EnglishName, maleName);
                     }
                     else
                     {
-                        _arrayOfspanWithEntityNames[i].Span = _arrayOfspanWithEntityNames[i].Span.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].EnglishName, femaleName);
+                        _arrayOfspanWithEntityNames[i].EnglishSpan = _arrayOfspanWithEntityNames[i].EnglishSpan.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].EnglishName, femaleName);
                     }
                 }
             }
         }
 
+        private void RestoreOriginalNamesFromEntityNames() //method should called after translate text
+        {
+
+        }
+
         private void TranslateAllSpans()
         {
-            var spans = _arrayOfspanWithEntityNames.Select(x => x.Span).ToList();
+            var spans = _arrayOfspanWithEntityNames.Select(x => x.EnglishSpan).ToList();
             var translatedSpans = TextTranslator.Instance.SendRequests(spans).GetAwaiter().GetResult().ToArray();
             
             for (int i = 0;i < translatedSpans.Length; i++)
             {
-                _arrayOfTranslatedspanWithEntityNames.Add(new SpanWithEntityNames()
-                {
-                    Span = translatedSpans[i],
-                    EntityNames = _arrayOfspanWithEntityNames[i].EntityNames,
-                    IndexOfOriginalText = _arrayOfspanWithEntityNames[i].IndexOfOriginalText
-                });
+                _arrayOfspanWithEntityNames[i].ArabicSpan = translatedSpans[i];
             }
         }
 
@@ -106,7 +106,7 @@ namespace NovelTextProcessor
 
             foreach (var item in _arrayOfspanWithEntityNames)
             {
-                sb.AppendLine(item.Span);
+                sb.AppendLine(item.EnglishSpan);
             }
             return sb.ToString();
         }
