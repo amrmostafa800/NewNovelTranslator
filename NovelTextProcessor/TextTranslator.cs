@@ -29,7 +29,7 @@ namespace NovelTextProcessor
             return responses;
         }
 
-        protected async Task<string> SendRequestAsync(string Text)
+        protected Task<string> SendRequestAsync(string Text)
         {
             var timeTicks = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var verifyToken = $"webkey_E3sTuMjpP8Jez49GcYpDVH7r#{timeTicks}#{Text}";
@@ -77,9 +77,9 @@ namespace NovelTextProcessor
                 JObject jsonObject = JObject.Parse(responseBody);
 
                 JToken translationToken = jsonObject.SelectToken("data.translation")!;
-                return translationToken!.ToString();
+                return Task.FromResult(translationToken!.ToString());
             }
-            return null!;
+            return Task.FromResult<string>(null!);
         }
     }
 }

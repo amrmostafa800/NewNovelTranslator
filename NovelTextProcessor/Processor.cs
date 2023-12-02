@@ -11,19 +11,21 @@ namespace NovelTextProcessor
         string _novelText;
         EntityName[] _entityNames = Array.Empty<EntityName>();
         Document _document = null!;
-        List<SpanWithEntityNames> _arrayOfspanWithEntityNames = null!;
-        List<SpanWithEntityNames> _arrayOfTranslatedspanWithEntityNames = null!;
+        List<SpanWithEntityNames> _arrayOfspanWithEntityNames;
+        List<SpanWithEntityNames> _arrayOfTranslatedspanWithEntityNames;
 
 
         public Processor(string text, EntityName[] entityNames)
         {
             _novelText = text;
             _entityNames = entityNames;
+            _arrayOfspanWithEntityNames = new List<SpanWithEntityNames>();
+            _arrayOfTranslatedspanWithEntityNames = new List<SpanWithEntityNames>();
 
             DocumentProcessing();
             GenerateArrayOfSpanWithEntityNamesFromString();
-            ReplaceAllEntityNamesToStaticNames("Oliver", "Maria");
-            TranslateAllSpans(); //TDO translate and return Entity names to original one after translate using same method : ReplaceAllEntityNamesToStaticNames
+            ReplaceAllEntityNamesToStaticNames("Oliver", "Maria"); //TDO maybe add names to config file
+            TranslateAllSpans(); //TDO translate and return Entity names to original one after translate
             ConvertSpansToNormalText();
         }
 
@@ -35,8 +37,6 @@ namespace NovelTextProcessor
 
         private void GenerateArrayOfSpanWithEntityNamesFromString()
         {
-            _arrayOfspanWithEntityNames = new List<SpanWithEntityNames>();
-
             foreach (var span in _document)
             {
                 _arrayOfspanWithEntityNames.Add(GenerateSpanWithEntityNamesFromString(span.TokenizedValue));
@@ -58,7 +58,7 @@ namespace NovelTextProcessor
 
             for (int i = 0; i < _entityNames.Length; i++)
             {
-                if (text.Contains(_entityNames[i].Name))
+                if (text.Contains(_entityNames[i].EnglishName))
                 {
                     spanWithEntityNames.EntityNames.Add(_entityNames[i]);
                 }
@@ -74,11 +74,11 @@ namespace NovelTextProcessor
                 {
                     if (_arrayOfspanWithEntityNames[i].EntityNames[t].Gender == 'M')
                     {
-                        _arrayOfspanWithEntityNames[i].Span = _arrayOfspanWithEntityNames[i].Span.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].Name, maleName);
+                        _arrayOfspanWithEntityNames[i].Span = _arrayOfspanWithEntityNames[i].Span.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].EnglishName, maleName);
                     }
                     else
                     {
-                        _arrayOfspanWithEntityNames[i].Span = _arrayOfspanWithEntityNames[i].Span.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].Name, femaleName);
+                        _arrayOfspanWithEntityNames[i].Span = _arrayOfspanWithEntityNames[i].Span.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].EnglishName, femaleName);
                     }
                 }
             }
@@ -93,14 +93,14 @@ namespace NovelTextProcessor
             {
                 _arrayOfTranslatedspanWithEntityNames.Add(new SpanWithEntityNames()
                 {
-                    Span = spans[i],
+                    Span = translatedSpans[i],
                     EntityNames = _arrayOfspanWithEntityNames[i].EntityNames,
                     IndexOfOriginalText = _arrayOfspanWithEntityNames[i].IndexOfOriginalText
                 });
             }
         }
 
-        private string ConvertSpansToNormalText() //TDO Edit all method to fix format to bycome same format of original document
+        private string ConvertSpansToNormalText() //TDO Edit all method to fix format to bycome same format of original document + Find Better Name For Method
         {
             StringBuilder sb = new StringBuilder();
 

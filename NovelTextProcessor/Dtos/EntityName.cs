@@ -9,7 +9,8 @@ namespace NovelTextProcessor.Dtos
 {
     public class EntityName
     {
-        public string Name { get; set; } = null!;
+        public string EnglishName { get; set; } = null!;
+        public string ArabicName { get; set; } = null!;
 
         [AllowedValues('M','F')]
         public Char Gender { get; set; }

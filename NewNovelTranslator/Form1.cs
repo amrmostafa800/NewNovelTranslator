@@ -34,15 +34,15 @@ namespace NewNovelTranslator
                 //new EntityName { Name = "Hannah", Gender = 'F' },
                 //new EntityName { Name = "Isaac", Gender = 'M' },
                 //new EntityName { Name = "Jessica", Gender = 'F' },
-                new EntityName { Name = "Kevin", Gender = 'M' },
-                new EntityName { Name = "Laura", Gender = 'F' },
-                new EntityName { Name = "Michael", Gender = 'M' },
                 //new EntityName { Name = "Nicole", Gender = 'F' },
                 //new EntityName { Name = "Oliver", Gender = 'M' },
                 //new EntityName { Name = "Patricia", Gender = 'F' },
                 //new EntityName { Name = "Quentin", Gender = 'M' },
                 //new EntityName { Name = "Rachel", Gender = 'F' },
                 //new EntityName { Name = "Steven", Gender = 'M' },
+                new EntityName { EnglishName = "Kevin", ArabicName = "ﬂÌ›‰", Gender = 'M' },
+                new EntityName { EnglishName = "Laura", ArabicName = "·Ê—«", Gender = 'F' },
+                new EntityName { EnglishName = "Michael", ArabicName = "„«Ìﬂ·", Gender = 'M' },
             };
 
             Processor processor = new Processor(text.Text, seedData.ToArray());
