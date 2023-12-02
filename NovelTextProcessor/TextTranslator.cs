@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using NovelTextProcessor.Dtos;
 using NovelTextProcessor.Helpers;
 using System;
@@ -21,9 +22,9 @@ namespace NovelTextProcessor
         }
         public static TextTranslator Instance { get; } = new TextTranslator();
 
-        public async Task<IEnumerable<string>> SendRequests(IEnumerable<string> ArrayOfText)
+        public async Task<IEnumerable<string>> SendRequests(IEnumerable<string> arrayOfText)
         {
-            var tasks = ArrayOfText.Select(text => SendRequestAsync(text));
+            var tasks = arrayOfText.Select(text => SendRequestAsync(text));
             var responses = await Task.WhenAll(tasks);
             return responses;
         }
@@ -33,7 +34,7 @@ namespace NovelTextProcessor
             var timeTicks = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var verifyToken = $"webkey_E3sTuMjpP8Jez49GcYpDVH7r#{timeTicks}#{Text}";
 
-            var verifyTokenAsMd5Hash = MD5Helper.NewMD5(verifyToken);
+            var hash = MD5Helper.NewMD5(verifyToken);
 
             var requestBody = new TranslationRequestDto
             {
@@ -43,7 +44,7 @@ namespace NovelTextProcessor
                 q = Text,
                 hints = "",
                 ts = timeTicks,
-                verify = verifyTokenAsMd5Hash
+                verify = hash
             };
 
             string jsonString = JsonSerializer.Serialize(requestBody);
@@ -68,8 +69,8 @@ namespace NovelTextProcessor
             request.Content = new StringContent(jsonString);
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            var response = await httpClient.SendAsync(request);
-            var responseBody = await response.Content.ReadAsStringAsync();
+            var response = httpClient.SendAsync(request).Result;
+            var responseBody = response.Content.ReadAsStringAsync().Result;
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {

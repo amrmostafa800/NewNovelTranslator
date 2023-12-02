@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NovelTextProcessor
 {
-    public sealed class ThreadSafeHttpClientSingleton //This Class By ChatGpt (not tested Yet)
+    public sealed class ThreadSafeHttpClientSingleton : IDisposable //This Class By ChatGpt (not tested Yet)
     {
         private static readonly Lazy<ThreadSafeHttpClientSingleton> lazyInstance =
             new Lazy<ThreadSafeHttpClientSingleton>(() => new ThreadSafeHttpClientSingleton());
@@ -25,6 +25,12 @@ namespace NovelTextProcessor
         {
             // You can customize the HttpClient instance here if needed
             return httpClient;
+        }
+
+        public void Dispose()
+        {
+            // Dispose of the HttpClient when the application is shutting down
+            httpClient.Dispose();
         }
     }
 }

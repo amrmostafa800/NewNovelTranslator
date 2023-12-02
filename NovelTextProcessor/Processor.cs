@@ -12,6 +12,7 @@ namespace NovelTextProcessor
         EntityName[] _entityNames = Array.Empty<EntityName>();
         Document _document = null!;
         List<SpanWithEntityNames> _arrayOfspanWithEntityNames = null!;
+        List<SpanWithEntityNames> _arrayOfTranslatedspanWithEntityNames = null!;
 
 
         public Processor(string text, EntityName[] entityNames)
@@ -22,7 +23,7 @@ namespace NovelTextProcessor
             DocumentProcessing();
             GenerateArrayOfSpanWithEntityNamesFromString();
             ReplaceAllEntityNamesToStaticNames("Oliver", "Maria");
-            //TDO translate and return Entity names to original one after translate using same method : ReplaceAllEntityNamesToStaticNames
+            TranslateAllSpans(); //TDO translate and return Entity names to original one after translate using same method : ReplaceAllEntityNamesToStaticNames
             ConvertSpansToNormalText();
         }
 
@@ -83,6 +84,22 @@ namespace NovelTextProcessor
             }
         }
 
+        private void TranslateAllSpans()
+        {
+            var spans = _arrayOfspanWithEntityNames.Select(x => x.Span).ToList();
+            var translatedSpans = TextTranslator.Instance.SendRequests(spans).GetAwaiter().GetResult().ToArray();
+            
+            for (int i = 0;i < translatedSpans.Length; i++)
+            {
+                _arrayOfTranslatedspanWithEntityNames.Add(new SpanWithEntityNames()
+                {
+                    Span = spans[i],
+                    EntityNames = _arrayOfspanWithEntityNames[i].EntityNames,
+                    IndexOfOriginalText = _arrayOfspanWithEntityNames[i].IndexOfOriginalText
+                });
+            }
+        }
+
         private string ConvertSpansToNormalText() //TDO Edit all method to fix format to bycome same format of original document
         {
             StringBuilder sb = new StringBuilder();
@@ -94,5 +111,10 @@ namespace NovelTextProcessor
             return sb.ToString();
         }
 
+
+        ~Processor()
+        {
+            ThreadSafeHttpClientSingleton.Instance.Dispose();
+        }
     }
 }
