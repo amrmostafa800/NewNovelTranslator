@@ -47,7 +47,7 @@ namespace NewNovelTranslator
 
             Processor processor = new Processor(text.Text, seedData.ToArray());
 
-            MessageBox.Show("");
+            MessageBox.Show(processor.GetResult());
 
         }
     }

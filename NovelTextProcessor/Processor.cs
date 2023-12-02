@@ -12,19 +12,21 @@ namespace NovelTextProcessor
         EntityName[] _entityNames = Array.Empty<EntityName>();
         Document _document = null!;
         List<SpanWithEntityNames> _arrayOfspanWithEntityNames;
-
+        string _finalText;
         public Processor(string text, EntityName[] entityNames)
         {
             _novelText = text;
             _entityNames = entityNames;
             _arrayOfspanWithEntityNames = new List<SpanWithEntityNames>();
+            _finalText = null!;
 
             DocumentProcessing();
             GenerateArrayOfSpanWithEntityNamesFromString();
             ReplaceAllEntityNamesToStaticNames("Oliver", "Maria"); //TDO maybe add names to config file
             TranslateAllSpans(); //TDO translate and return Entity names to original one after translate
             RestoreOriginalNamesFromEntityNames("أوليفر", "ماريا");
-            ConvertSpansToNormalText();
+            GenerateTextAfterAllEdits(); //Better try edit _document to get same text format of TokenizedValue
+            //ReGenerateDocumentFromSpans();
         }
 
         private void DocumentProcessing()
@@ -111,15 +113,33 @@ namespace NovelTextProcessor
             }
         }
 
-        private string ConvertSpansToNormalText() //TDO Edit all method to fix format to bycome same format of original document + Find Better Name For Method
+        //private string ReGenerateDocumentFromSpans()
+        //{
+        //    StringBuilder sb = new StringBuilder(_document.TokenizedValue().Trim());
+        //    foreach (var item in _arrayOfspanWithEntityNames)
+        //    {
+        //        sb.ReplaceFromTwoIndexToNewText(item.IndexOfOriginalText.From, item.IndexOfOriginalText.To, item.ArabicSpan);
+        //    }
+
+        //    return sb.ToString();
+        //}
+
+        private void GenerateTextAfterAllEdits()
         {
             StringBuilder sb = new StringBuilder();
 
             foreach (var item in _arrayOfspanWithEntityNames)
             {
-                sb.AppendLine(item.EnglishSpan);
+                sb.AppendLine(item.ArabicSpan);
+                sb.AppendLine();
             }
-            return sb.ToString();
+            sb.Replace(" ،", "،"); // fix locaton of , (it change in TokenizedValue To Bycome from "," to " ,")
+            _finalText = sb.ToString();
+        }
+
+        public string GetResult()
+        {
+            return _finalText;
         }
 
 
