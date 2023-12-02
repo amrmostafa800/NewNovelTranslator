@@ -12,20 +12,18 @@ namespace NovelTextProcessor
         EntityName[] _entityNames = Array.Empty<EntityName>();
         Document _document = null!;
         List<SpanWithEntityNames> _arrayOfspanWithEntityNames;
-        //List<SpanWithEntityNames> _arrayOfTranslatedspanWithEntityNames;
-
 
         public Processor(string text, EntityName[] entityNames)
         {
             _novelText = text;
             _entityNames = entityNames;
             _arrayOfspanWithEntityNames = new List<SpanWithEntityNames>();
-            //_arrayOfTranslatedspanWithEntityNames = new List<SpanWithEntityNames>();
 
             DocumentProcessing();
             GenerateArrayOfSpanWithEntityNamesFromString();
             ReplaceAllEntityNamesToStaticNames("Oliver", "Maria"); //TDO maybe add names to config file
             TranslateAllSpans(); //TDO translate and return Entity names to original one after translate
+            RestoreOriginalNamesFromEntityNames("أوليفر", "ماريا");
             ConvertSpansToNormalText();
         }
 
@@ -84,9 +82,22 @@ namespace NovelTextProcessor
             }
         }
 
-        private void RestoreOriginalNamesFromEntityNames() //method should called after translate text
+        private void RestoreOriginalNamesFromEntityNames(string maleName, string femaleName) //method should called after translate text
         {
-
+            for (int i = 0; i < _arrayOfspanWithEntityNames.Count; i++)
+            {
+                for (int t = 0; t < _arrayOfspanWithEntityNames[i].EntityNames.Count; t++)
+                {
+                    if (_arrayOfspanWithEntityNames[i].EntityNames[t].Gender == 'M')
+                    {
+                        _arrayOfspanWithEntityNames[i].ArabicSpan = _arrayOfspanWithEntityNames[i].ArabicSpan.ReplaceFirst(maleName, _arrayOfspanWithEntityNames[i].EntityNames[t].ArabicName);
+                    }
+                    else
+                    {
+                        _arrayOfspanWithEntityNames[i].ArabicSpan = _arrayOfspanWithEntityNames[i].ArabicSpan.ReplaceFirst(femaleName, _arrayOfspanWithEntityNames[i].EntityNames[t].ArabicName);
+                    }
+                }
+            }
         }
 
         private void TranslateAllSpans()
