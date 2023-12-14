@@ -9,10 +9,11 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace NovelTextProcessor
 {
-    internal class TextTranslator
+    internal class TextTranslator // need edit to make more fast
     {
         private readonly HttpClient httpClient;
 
@@ -24,12 +25,24 @@ namespace NovelTextProcessor
 
         public async Task<IEnumerable<string>> SendRequests(IEnumerable<string> arrayOfText)
         {
-            var tasks = arrayOfText.Select(text => SendRequestAsync(text));
-            var responses = await Task.WhenAll(tasks);
-            return responses;
+            var tasks = new List<Task<string>>(); // Use List<Task<string>> for asynchronous tasks
+
+            foreach (var text in arrayOfText)
+            {
+                var task = Task.Run(() => SendRequestAsync(text));
+                tasks.Add(task);
+            }
+
+            // Wait for all tasks to complete
+            await Task.WhenAll(tasks);
+
+            // Retrieve results from completed tasks
+            var results = tasks.Select(task => task.Result);
+
+            return results;
         }
 
-        protected Task<string> SendRequestAsync(string Text)
+        protected async Task<string> SendRequestAsync(string Text)
         {
             var timeTicks = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             var verifyToken = $"webkey_E3sTuMjpP8Jez49GcYpDVH7r#{timeTicks}#{Text}";
@@ -69,17 +82,17 @@ namespace NovelTextProcessor
             request.Content = new StringContent(jsonString);
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            var response = httpClient.SendAsync(request).Result;
-            var responseBody = response.Content.ReadAsStringAsync().Result;
+            var response =  await httpClient.SendAsync(request);
+            var responseBody = await response.Content.ReadAsStringAsync();
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 JObject jsonObject = JObject.Parse(responseBody);
 
                 JToken translationToken = jsonObject.SelectToken("data.translation")!;
-                return Task.FromResult(translationToken!.ToString());
+                return translationToken!.ToString();
             }
-            return Task.FromResult<string>(null!);
+            return null!;
         }
     }
 }

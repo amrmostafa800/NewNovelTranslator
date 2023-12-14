@@ -105,7 +105,7 @@ namespace NovelTextProcessor
         private void TranslateAllSpans()
         {
             var spans = _arrayOfspanWithEntityNames.Select(x => x.EnglishSpan).ToList();
-            var translatedSpans = TextTranslator.Instance.SendRequests(spans).GetAwaiter().GetResult().ToArray();
+            var translatedSpans = Task.Run(() => TextTranslator.Instance.SendRequests(spans).GetAwaiter().GetResult().ToArray()).Result;
             
             for (int i = 0;i < translatedSpans.Length; i++)
             {
