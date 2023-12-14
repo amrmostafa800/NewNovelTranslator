@@ -10,6 +10,11 @@ namespace NewNovelTranslator
             InitializeComponent();
         }
 
+        ~Form1()
+        {
+            ThreadSafeHttpClientSingleton.Instance.Dispose();
+        }
+
         private void start_Click(object sender, EventArgs e)
         {
             //DocumentProcessor docprocessor = new DocumentProcessor(text.Text);

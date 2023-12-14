@@ -141,11 +141,5 @@ namespace NovelTextProcessor
         {
             return _finalText;
         }
-
-
-        ~Processor()
-        {
-            ThreadSafeHttpClientSingleton.Instance.Dispose();
-        }
     }
 }
