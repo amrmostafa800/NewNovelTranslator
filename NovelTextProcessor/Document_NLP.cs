@@ -5,11 +5,11 @@ using System.Diagnostics;
 
 namespace NovelTextProcessor
 {
-    public class DocumentProcessor
+    public class Document_NLP
     {
         Pipeline _nlp;
         public Document document;
-        public DocumentProcessor(string text)
+        public Document_NLP(string text)
         {
             English.Register();
             _nlp = Pipeline.For(Language.English);

@@ -1,145 +1,176 @@
-﻿using Catalyst;
-using NovelTextProcessor.Dtos;
+﻿using NovelTextProcessor.Dtos;
 using NovelTextProcessor.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace NovelTextProcessor
 {
     public class Processor
     {
         string _novelText;
-        EntityName[] _entityNames = Array.Empty<EntityName>();
-        Document _document = null!;
-        List<SpanWithEntityNames> _arrayOfspanWithEntityNames;
-        string _finalText;
-        public Processor(string text, EntityName[] entityNames)
+        EntityName[] _entityNames = null!;
+        List<SpanAndEntityNames> listOfSpanAndEntityNames = new();
+
+        string FixedEnMaleName = "Oliver";
+        string FixedArMaleName = "أوليفر";
+        string FixedEnFemaleName = "Maria";
+        string FixedArFemaleName = "ماريا";
+
+        public Processor(string novelText, EntityName[] entityNames)
         {
-            _novelText = text;
+            _novelText = novelText;
             _entityNames = entityNames;
-            _arrayOfspanWithEntityNames = new List<SpanWithEntityNames>();
-            _finalText = null!;
 
-            DocumentProcessing();
-            GenerateArrayOfSpanWithEntityNamesFromString();
-            ReplaceAllEntityNamesToStaticNames("Oliver", "Maria"); //TDO maybe add names to config file
-            TranslateAllSpans(); //TDO translate and return Entity names to original one after translate
-            RestoreOriginalNamesFromEntityNames("أوليفر", "ماريا");
-            GenerateTextAfterAllEdits(); //Better try edit _document to get same text format of TokenizedValue
-            //ReGenerateDocumentFromSpans();
+            _Worker();
         }
 
-        private void DocumentProcessing()
+        private void _Worker()
         {
-            DocumentProcessor documentProcessor = new DocumentProcessor(_novelText.Trim());
-            _document = documentProcessor.document;
+            var englishSpans = _SplitTextToSpans();
+
+            _MapEnglishSpansToListOfSpanAndEntityNames(ref englishSpans,ref listOfSpanAndEntityNames);
+            _SearchForEntityNamesInSpans(ref listOfSpanAndEntityNames);
+            _ReplaceAllEntityNamesInSpanToFixedName(ref listOfSpanAndEntityNames);
+            _TranslateAllSpans(ref listOfSpanAndEntityNames); // now spans in listOfSpanAndEntityNames is translated but names is FixedNames and listOfSpanAndEntityNames.EntityName have original names
+            _RestoreOriginalNames(ref listOfSpanAndEntityNames); // now spans ready
         }
 
-        private void GenerateArrayOfSpanWithEntityNamesFromString()
+        private void _RestoreOriginalNames(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
         {
-            foreach (var span in _document)
+            for (int i = 0; i < listOfSpanAndEntityNames.Count; i++)
             {
-                _arrayOfspanWithEntityNames.Add(GenerateSpanWithEntityNamesFromString(span.TokenizedValue));
-            }
-        }
-
-        private SpanWithEntityNames GenerateSpanWithEntityNamesFromString(string text)
-        {
-            var indexOfText = _document.TokenizedValue().IndexOf(text);
-            var spanWithEntityNames = new SpanWithEntityNames()
-            {
-                EnglishSpan = text,
-                IndexOfOriginalText = new() 
+                for (int t = 0; t < listOfSpanAndEntityNames[i].EntityNames.Count; t++)
                 {
-                    From = indexOfText,
-                    To = indexOfText + text.Length
-                }
-            };
-
-            for (int i = 0; i < _entityNames.Length; i++)
-            {
-                if (text.Contains(_entityNames[i].EnglishName))
-                {
-                    spanWithEntityNames.EntityNames.Add(_entityNames[i]);
-                }
-            }
-            return spanWithEntityNames;
-        }
-
-        private void ReplaceAllEntityNamesToStaticNames(string maleName,string femaleName)
-        {
-            for (int i = 0; i < _arrayOfspanWithEntityNames.Count; i++)
-            {
-                for (int t = 0; t < _arrayOfspanWithEntityNames[i].EntityNames.Count; t++)
-                {
-                    if (_arrayOfspanWithEntityNames[i].EntityNames[t].Gender == 'M')
+                    if (listOfSpanAndEntityNames[i].EntityNames[t].Gender == 'M')
                     {
-                        _arrayOfspanWithEntityNames[i].EnglishSpan = _arrayOfspanWithEntityNames[i].EnglishSpan.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].EnglishName, maleName);
+                        listOfSpanAndEntityNames[i].Span = listOfSpanAndEntityNames[i].Span.ReplaceFirst(FixedArMaleName, listOfSpanAndEntityNames[i].EntityNames[t].ArabicName);
                     }
                     else
                     {
-                        _arrayOfspanWithEntityNames[i].EnglishSpan = _arrayOfspanWithEntityNames[i].EnglishSpan.ReplaceFirst(_arrayOfspanWithEntityNames[i].EntityNames[t].EnglishName, femaleName);
+                        listOfSpanAndEntityNames[i].Span = listOfSpanAndEntityNames[i].Span.ReplaceFirst(FixedArFemaleName, listOfSpanAndEntityNames[i].EntityNames[t].ArabicName);
                     }
                 }
             }
         }
 
-        private void RestoreOriginalNamesFromEntityNames(string maleName, string femaleName) //method should called after translate text
+        private void _TranslateAllSpans(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
         {
-            for (int i = 0; i < _arrayOfspanWithEntityNames.Count; i++)
-            {
-                for (int t = 0; t < _arrayOfspanWithEntityNames[i].EntityNames.Count; t++)
-                {
-                    if (_arrayOfspanWithEntityNames[i].EntityNames[t].Gender == 'M')
-                    {
-                        _arrayOfspanWithEntityNames[i].ArabicSpan = _arrayOfspanWithEntityNames[i].ArabicSpan.ReplaceFirst(maleName, _arrayOfspanWithEntityNames[i].EntityNames[t].ArabicName);
-                    }
-                    else
-                    {
-                        _arrayOfspanWithEntityNames[i].ArabicSpan = _arrayOfspanWithEntityNames[i].ArabicSpan.ReplaceFirst(femaleName, _arrayOfspanWithEntityNames[i].EntityNames[t].ArabicName);
-                    }
-                }
-            }
-        }
-
-        private void TranslateAllSpans()
-        {
-            var spans = _arrayOfspanWithEntityNames.Select(x => x.EnglishSpan).ToList();
+            var spans = listOfSpanAndEntityNames.Select(x => x.Span).ToList();
             var translatedSpans = Task.Run(() => TextTranslator.Instance.SendRequests(spans).GetAwaiter().GetResult().ToArray()).Result;
-            
-            for (int i = 0;i < translatedSpans.Length; i++)
+
+            for (int i = 0; i < translatedSpans.Length; i++)
             {
-                _arrayOfspanWithEntityNames[i].ArabicSpan = translatedSpans[i];
+                listOfSpanAndEntityNames[i].Span = translatedSpans[i];
             }
         }
 
-        //private string ReGenerateDocumentFromSpans()
-        //{
-        //    StringBuilder sb = new StringBuilder(_document.TokenizedValue().Trim());
-        //    foreach (var item in _arrayOfspanWithEntityNames)
-        //    {
-        //        sb.ReplaceFromTwoIndexToNewText(item.IndexOfOriginalText.From, item.IndexOfOriginalText.To, item.ArabicSpan);
-        //    }
+        private void _ReplaceAllEntityNamesInSpanToFixedName(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
+        {
+            for (int i = 0; i < listOfSpanAndEntityNames.Count; i++) 
+            {
+                foreach (var entityName in listOfSpanAndEntityNames[i].EntityNames)
+                {
+                    if (entityName.Gender == 'M')
+                    {
+                        listOfSpanAndEntityNames[i].Span = listOfSpanAndEntityNames[i].Span.Replace(entityName.EnglishName, FixedEnMaleName);
+                    }
+                    else
+                    {
+                        listOfSpanAndEntityNames[i].Span = listOfSpanAndEntityNames[i].Span.Replace(entityName.EnglishName, FixedEnFemaleName);
+                    }
+                }
+            }
+        }
 
-        //    return sb.ToString();
+        private void _MapEnglishSpansToListOfSpanAndEntityNames(ref string[] englishSpans, ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
+        {
+            foreach (var englishSpan in englishSpans)
+            {
+                listOfSpanAndEntityNames.Add(new SpanAndEntityNames()
+                {
+                    Span = englishSpan
+                });
+            }
+        }
+
+        /// <summary>
+        /// Search In All List of SpanAndEntityNames If Found Span Contain EntityName Than Add it To SpanAndEntityNames.EntityNames
+        /// </summary>
+        /// <param name="listOfSpanAndEntityNames"></param>
+        private void _SearchForEntityNamesInSpans(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
+        {
+            for (int i = 0; i < listOfSpanAndEntityNames.Count; i++) 
+            {
+                listOfSpanAndEntityNames[i].EntityNames = _SearchForEntityNamesInSpan(new(listOfSpanAndEntityNames[i]));
+            }
+        }
+
+        private List<EntityName> _SearchForEntityNamesInSpan(SpanAndEntityNames spanAndEntityNames)
+        {
+            while(true)
+            {
+                var currentEntityName = _GetFirstEntityNameInSpan(spanAndEntityNames.Span);
+
+                if (currentEntityName == null)
+                    break;
+
+                spanAndEntityNames.EntityNames.Add(currentEntityName);
+                spanAndEntityNames.Span = spanAndEntityNames.Span.ReplaceFirst(currentEntityName.EnglishName, ""); // remove from span
+                currentEntityName = null;
+            }
+
+
+            return spanAndEntityNames.EntityNames;
+        }
+
+        private EntityName? _GetFirstEntityNameInSpan(string span)
+        {
+            foreach (var entityName in _entityNames)
+            {
+                if (span.Contains(entityName.EnglishName))
+                {
+                    return entityName;
+                }
+            }
+            return null;
+        }
+
+        private string[] _SplitTextToSpans()
+        {
+            return _novelText.Split(Environment.NewLine);
+        }
+
+        //private int _CountHowMuchEntityNamesInSpan(string englishSpan)
+        //{
+        //    int count = 0;
+        //    for (int i = 0; i < _entityNames.Length; i++)
+        //    {
+        //        while (englishSpan.Contains(_entityNames[i].EnglishName))
+        //        {
+        //            count++;
+        //            englishSpan = englishSpan.ReplaceFirst(_entityNames[i].EnglishName, ""); // remove after count to dont count again
+        //        }
+        //    }
+        //    return count;
         //}
 
-        private void GenerateTextAfterAllEdits()
+        private string _GenerateTextAfterAllEdits()
         {
             StringBuilder sb = new StringBuilder();
 
-            foreach (var item in _arrayOfspanWithEntityNames)
+            foreach (var item in listOfSpanAndEntityNames)
             {
-                sb.AppendLine(item.ArabicSpan);
-                sb.AppendLine();
+                sb.AppendLine(item.Span);
+                sb.AppendLine(Environment.NewLine);
             }
-            sb.Replace(" ،", "،"); // fix locaton of , (it change in TokenizedValue To Bycome from "," to " ,")
-            _finalText = sb.ToString();
+            return sb.ToString();
         }
-
         public string GetResult()
         {
-            return _finalText;
+            return _GenerateTextAfterAllEdits();
         }
     }
 }
