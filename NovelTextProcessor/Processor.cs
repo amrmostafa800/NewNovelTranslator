@@ -140,7 +140,17 @@ namespace NovelTextProcessor
 
         private string[] _SplitTextToSpans()
         {
-            return _novelText.Split(Environment.NewLine);
+            List<string> spans = _novelText.Split(Environment.NewLine).ToList();
+
+            for (int i = 0; i < spans.Count; i++)
+            {
+                if (spans[i] == string.Empty)
+                {
+                    spans.RemoveAt(i);
+                }
+            }
+
+            return spans.ToArray();
         }
 
         //private int _CountHowMuchEntityNamesInSpan(string englishSpan)
@@ -161,12 +171,11 @@ namespace NovelTextProcessor
         {
             StringBuilder sb = new StringBuilder();
 
-            foreach (var item in listOfSpanAndEntityNames)
+            for (int i = 0; i < listOfSpanAndEntityNames.Count; i++)
             {
-                sb.AppendLine(item.Span);
-                sb.AppendLine(Environment.NewLine);
+                sb.AppendLine(listOfSpanAndEntityNames[i].Span);
             }
-            return sb.ToString();
+            return sb.ToString().Trim();
         }
         public string GetResult()
         {
