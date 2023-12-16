@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 
 namespace NovelTextProcessor
 {
-    internal class TextTranslator // need edit to make more fast
+    internal class TextTranslator // TDO Use Paging to control Amount Of Thereds
     {
         private readonly HttpClient httpClient;
 

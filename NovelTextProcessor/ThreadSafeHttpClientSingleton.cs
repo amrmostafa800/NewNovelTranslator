@@ -1,6 +1,6 @@
 ﻿namespace NovelTextProcessor
 {
-    public sealed class ThreadSafeHttpClientSingleton : IDisposable //This Class By ChatGpt (not tested Yet)
+    public sealed class ThreadSafeHttpClientSingleton : IDisposable //This Class By ChatGpt
     {
         private static readonly Lazy<ThreadSafeHttpClientSingleton> lazyInstance =
             new Lazy<ThreadSafeHttpClientSingleton>(() => new ThreadSafeHttpClientSingleton());
