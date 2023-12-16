@@ -1,10 +1,6 @@
 ﻿using NovelTextProcessor.Dtos;
 using NovelTextProcessor.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace NovelTextProcessor
 {
@@ -31,7 +27,7 @@ namespace NovelTextProcessor
         {
             var englishSpans = _SplitTextToSpans();
 
-            _MapEnglishSpansToListOfSpanAndEntityNames(ref englishSpans,ref listOfSpanAndEntityNames);
+            _MapEnglishSpansToListOfSpanAndEntityNames(ref englishSpans, ref listOfSpanAndEntityNames);
             _SearchForEntityNamesInSpans(ref listOfSpanAndEntityNames);
             _ReplaceAllEntityNamesInSpanToFixedName(ref listOfSpanAndEntityNames);
             _TranslateAllSpans(ref listOfSpanAndEntityNames); // now spans in listOfSpanAndEntityNames is translated but names is FixedNames and listOfSpanAndEntityNames.EntityName have original names
@@ -69,7 +65,7 @@ namespace NovelTextProcessor
 
         private void _ReplaceAllEntityNamesInSpanToFixedName(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
         {
-            for (int i = 0; i < listOfSpanAndEntityNames.Count; i++) 
+            for (int i = 0; i < listOfSpanAndEntityNames.Count; i++)
             {
                 foreach (var entityName in listOfSpanAndEntityNames[i].EntityNames)
                 {
@@ -102,7 +98,7 @@ namespace NovelTextProcessor
         /// <param name="listOfSpanAndEntityNames"></param>
         private void _SearchForEntityNamesInSpans(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
         {
-            for (int i = 0; i < listOfSpanAndEntityNames.Count; i++) 
+            for (int i = 0; i < listOfSpanAndEntityNames.Count; i++)
             {
                 listOfSpanAndEntityNames[i].EntityNames = _SearchForEntityNamesInSpan(new(listOfSpanAndEntityNames[i]));
             }
@@ -110,7 +106,7 @@ namespace NovelTextProcessor
 
         private List<EntityName> _SearchForEntityNamesInSpan(SpanAndEntityNames spanAndEntityNames)
         {
-            while(true)
+            while (true)
             {
                 var currentEntityName = _GetFirstEntityNameInSpan(spanAndEntityNames.Span);
 

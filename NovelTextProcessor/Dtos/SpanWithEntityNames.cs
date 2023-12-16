@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace NovelTextProcessor.Dtos
+﻿namespace NovelTextProcessor.Dtos
 {
     internal class SpanWithEntityNames
     {

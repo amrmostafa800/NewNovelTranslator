@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace NovelTextProcessor.Dtos
 {
@@ -12,7 +7,7 @@ namespace NovelTextProcessor.Dtos
         public string EnglishName { get; set; } = null!;
         public string ArabicName { get; set; } = null!;
 
-        [AllowedValues('M','F')]
+        [AllowedValues('M', 'F')]
         public Char Gender { get; set; }
     }
 }

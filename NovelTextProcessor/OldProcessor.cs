@@ -2,7 +2,6 @@
 using NovelTextProcessor.Dtos;
 using NovelTextProcessor.Extensions;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace NovelTextProcessor
 {
@@ -49,7 +48,7 @@ namespace NovelTextProcessor
             var spanWithEntityNames = new SpanWithEntityNames()
             {
                 EnglishSpan = text,
-                IndexOfOriginalText = new() 
+                IndexOfOriginalText = new()
                 {
                     From = indexOfText,
                     To = indexOfText + text.Length
@@ -66,7 +65,7 @@ namespace NovelTextProcessor
             return spanWithEntityNames;
         }
 
-        private void ReplaceAllEntityNamesToStaticNames(string maleName,string femaleName)
+        private void ReplaceAllEntityNamesToStaticNames(string maleName, string femaleName)
         {
             for (int i = 0; i < _arrayOfspanWithEntityNames.Count; i++)
             {
@@ -106,8 +105,8 @@ namespace NovelTextProcessor
         {
             var spans = _arrayOfspanWithEntityNames.Select(x => x.EnglishSpan).ToList();
             var translatedSpans = Task.Run(() => TextTranslator.Instance.SendRequests(spans).GetAwaiter().GetResult().ToArray()).Result;
-            
-            for (int i = 0;i < translatedSpans.Length; i++)
+
+            for (int i = 0; i < translatedSpans.Length; i++)
             {
                 _arrayOfspanWithEntityNames[i].ArabicSpan = translatedSpans[i];
             }

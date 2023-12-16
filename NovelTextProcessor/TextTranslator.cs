@@ -1,14 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using NovelTextProcessor.Dtos;
 using NovelTextProcessor.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace NovelTextProcessor
 {
@@ -59,8 +52,6 @@ namespace NovelTextProcessor
                 verify = hash
             };
 
-            string jsonString = JsonSerializer.Serialize(requestBody);
-
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://webapi.modernmt.com/translate");
 
             request.Headers.Add("authority", "webapi.modernmt.com");
@@ -78,10 +69,10 @@ namespace NovelTextProcessor
             request.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
             request.Headers.Add("x-http-method-override", "GET");
 
-            request.Content = new StringContent(jsonString);
+            request.Content = new StringContent(JObject.FromObject(requestBody).ToString());
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            var response =  await httpClient.SendAsync(request);
+            var response = await httpClient.SendAsync(request);
             var responseBody = await response.Content.ReadAsStringAsync();
 
             if (response.StatusCode == System.Net.HttpStatusCode.OK)
