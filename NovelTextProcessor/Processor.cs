@@ -55,7 +55,7 @@ namespace NovelTextProcessor
         private void _TranslateAllSpans(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
         {
             var spans = listOfSpanAndEntityNames.Select(x => x.Span).ToList();
-            var translatedSpans = Task.Run(() => TextTranslator.Instance.SendRequests(spans).GetAwaiter().GetResult().ToArray()).Result;
+            var translatedSpans = Task.Run(() => TextTranslator.Instance.SendRequests(spans).GetAwaiter().GetResult().ToArray()).Result; //TDO Find Better Why Other Than Create New Thered
 
             for (int i = 0; i < translatedSpans.Length; i++)
             {
