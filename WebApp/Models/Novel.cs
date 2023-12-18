@@ -9,5 +9,7 @@ namespace WebApp.Models
 
         [Column(TypeName = "VARCHAR"),MaxLength(300)]
         public required string NovelName { get; set; }
+        
+        //TDO add UserId Of Who Create Novel
     }
 }
