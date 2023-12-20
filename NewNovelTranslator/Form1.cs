@@ -15,7 +15,7 @@ namespace NewNovelTranslator
             ThreadSafeHttpClientSingleton.Instance.Dispose();
         }
 
-        private void start_Click(object sender, EventArgs e)
+        private async void start_Click(object sender, EventArgs e)
         {
             //DocumentProcessor docprocessor = new DocumentProcessor(text.Text);
 
@@ -51,6 +51,7 @@ namespace NewNovelTranslator
             };
 
             Processor processor = new Processor(text.Text, seedData.ToArray());
+            await processor.RunAsync();
 
             MessageBox.Show(processor.GetResult());
 

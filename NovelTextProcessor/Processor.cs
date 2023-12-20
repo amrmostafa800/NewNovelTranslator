@@ -19,18 +19,16 @@ namespace NovelTextProcessor
 		{
 			_novelText = novelText;
 			_entityNames = entityNames;
-
-			_Worker();
 		}
 
-		private void _Worker()
+		public async Task RunAsync()
 		{
 			var englishSpans = _SplitTextToSpans(5000);
 
 			_MapEnglishSpansToListOfSpanAndEntityNames(ref englishSpans, ref listOfSpanAndEntityNames);
 			_SearchForEntityNamesInSpans(ref listOfSpanAndEntityNames);
 			_ReplaceAllEntityNamesInSpanToFixedName(ref listOfSpanAndEntityNames);
-			_TranslateAllSpans(ref listOfSpanAndEntityNames); // now spans in listOfSpanAndEntityNames is translated but names is FixedNames and listOfSpanAndEntityNames.EntityName have original names
+			listOfSpanAndEntityNames = await TranslateAllSpansAsync(listOfSpanAndEntityNames); // now spans in listOfSpanAndEntityNames is translated but names is FixedNames and listOfSpanAndEntityNames.EntityName have original names
 			_RestoreOriginalNames(ref listOfSpanAndEntityNames); // now spans ready
 		}
 
@@ -52,15 +50,17 @@ namespace NovelTextProcessor
 			}
 		}
 
-		private void _TranslateAllSpans(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
+		private async Task<List<SpanAndEntityNames>> TranslateAllSpansAsync(List<SpanAndEntityNames> listOfSpanAndEntityNames)
 		{
 			var spans = listOfSpanAndEntityNames.Select(x => x.Span).ToList();
-			var translatedSpans = Task.Run(() => TextTranslator.Instance.SendRequests(spans).GetAwaiter().GetResult().ToArray()).Result; //TDO Find Better Why Other Than Create New Thered
+			var pretranslateSpans = await TextTranslator.Instance.SendRequests(spans);
+			var translatedSpans = pretranslateSpans.ToArray();
 
 			for (int i = 0; i < translatedSpans.Length; i++)
 			{
 				listOfSpanAndEntityNames[i].Span = translatedSpans[i];
 			}
+			return listOfSpanAndEntityNames;
 		}
 
 		private void _ReplaceAllEntityNamesInSpanToFixedName(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
