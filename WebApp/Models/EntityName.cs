@@ -13,8 +13,8 @@ namespace WebApp.Models
         [Column(TypeName = "VARCHAR"), AllowedValues('M','F')] 
         public required char Gender { get; set; }
 
-        public int NovelId { get; set; }
+        //public int NovelId { get; set; }
 
-        public virtual required Novel Novel { get; set; }
+        //public virtual required Novel Novel { get; set; }
     }
 }

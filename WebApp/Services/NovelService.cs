@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using WebApp.Data;
+using WebApp.Extensions;
 using WebApp.Models;
 
 namespace WebApp.Services
@@ -8,13 +11,27 @@ namespace WebApp.Services
     public class NovelService
     {
         private readonly ApplicationDbContext _context;
+		private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public NovelService(ApplicationDbContext context)
-        {
-            _context = context;
-        }
 
-        public async Task<List<Novel>> GetAllNovelsAsync()
+		public NovelService(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor)
+		{
+			_context = context;
+			_httpContextAccessor = httpContextAccessor;
+		}
+
+		public bool IsCurrentUserWhoCreateThisNovel(int novelUserId)
+		{
+			var currentUserId = _httpContextAccessor!.HttpContext!.User!.FindFirstValue(ClaimTypes.NameIdentifier)!.ToInt()!; // Get Current User ID
+
+			if (currentUserId == novelUserId)
+			{
+                return true;
+			}
+            return false;
+		}
+
+		public async Task<List<Novel>> GetAllNovelsAsync()
         {
             return await _context.Novels.ToListAsync();
         }
@@ -29,15 +46,30 @@ namespace WebApp.Services
             return novel;
         }
 
-        public async Task<bool> AddNovelAsync(Novel novel)
+		public async Task<int> GetNovelUserIdByIdAsync(int? id)
+		{
+			var userId = await _context.Novels
+				.Where(n => n.Id == id)
+				.Select(n => n.UserId)
+				.FirstOrDefaultAsync();
+
+			if (userId == 0) // novel id not found
+			{
+				return 0;
+			}
+			return userId;
+		}
+
+		public async Task<bool> AddNovelAsync(Novel novel)
         {
             //Check If Novel Exit Or Not
             if (await CheckIsNovelExistByNovelNameAsync(novel.NovelName))
             {
                 return false;
             }
+			novel.UserId = _httpContextAccessor!.HttpContext!.User!.FindFirstValue(ClaimTypes.NameIdentifier)!.ToInt()!; // Get Current User ID
 
-            _context.Add(novel);
+			_context.Add(novel);
             var changes = await _context.SaveChangesAsync();
             return changes != 0;
         }

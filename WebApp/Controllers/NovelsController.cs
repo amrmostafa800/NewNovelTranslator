@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApp.Data;
+using WebApp.Extensions;
 using WebApp.Models;
 using WebApp.Services;
 
@@ -45,6 +48,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Novels/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -55,9 +59,10 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,NovelName")] Novel novel)
+		[Authorize]
+		public async Task<IActionResult> Create([Bind("NovelName")] Novel novel)
         {
-            if (ModelState.IsValid)
+			if (ModelState.IsValid)
             {
                 if (await _novelService.AddNovelAsync(novel))
                 {
@@ -68,20 +73,27 @@ namespace WebApp.Controllers
             return View(novel);
         }
 
-        // GET: Novels/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+		// GET: Novels/Edit/5
+		[Authorize]
+		public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var novel = await _novelService.GetNovelByIdAsync(id);
+			var novel = await _novelService.GetNovelByIdAsync(id);
             if (novel == null)
             {
                 return NotFound();
             }
-            return View(novel);
+
+            if (!_novelService.IsCurrentUserWhoCreateThisNovel(novel.UserId)) 
+            {
+				return NotFound();
+			}
+
+			return View(novel);
         }
 
         // POST: Novels/Edit/5
@@ -89,7 +101,8 @@ namespace WebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,NovelName")] Novel novel)
+		[Authorize]
+		public async Task<IActionResult> Edit(int id, [Bind("Id,NovelName")] Novel novel)
         {
             if (id != novel.Id)
             {
@@ -98,9 +111,16 @@ namespace WebApp.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+				var novelUserId = await _novelService.GetNovelUserIdByIdAsync(id); // if novel id not found will get 0
+				novel.UserId = novelUserId; //Bind Will Make it 0 alwayes So Need Edit Here
+				if (!_novelService.IsCurrentUserWhoCreateThisNovel(novelUserId))
+				{
+					return NotFound();
+				}
+
+				try
                 {
-                    await _novelService.UpdateNovelAsync(novel);
+					await _novelService.UpdateNovelAsync(novel);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -111,8 +131,9 @@ namespace WebApp.Controllers
             return View(novel);
         }
 
-        // GET: Novels/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+		// GET: Novels/Delete/5
+		[Authorize]
+		public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -120,20 +141,27 @@ namespace WebApp.Controllers
             }
 
             var novel = await _novelService.GetNovelByIdAsync(id);
-            if (novel == null)
+            if (novel == null || !_novelService.IsCurrentUserWhoCreateThisNovel(novel.UserId))
             {
                 return NotFound();
             }
 
-            return View(novel);
+			return View(novel);
         }
 
         // POST: Novels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+		[Authorize]
+		public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (await _novelService.DeleteNovelAsync(id))
+			var novelUserId = await _novelService.GetNovelUserIdByIdAsync(id); // if novel id not found will get 0
+			if (!_novelService.IsCurrentUserWhoCreateThisNovel(novelUserId))
+			{
+				return NotFound();
+			}
+
+			if (await _novelService.DeleteNovelAsync(id))
             {
                 return RedirectToAction(nameof(Index));
             }

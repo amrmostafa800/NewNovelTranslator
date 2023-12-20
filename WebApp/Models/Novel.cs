@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WebApp.Data;
 
 namespace WebApp.Models
 {
@@ -9,7 +10,9 @@ namespace WebApp.Models
 
         [Column(TypeName = "VARCHAR"),MaxLength(300)]
         public required string NovelName { get; set; }
-        
-        //TDO add UserId Of Who Create Novel
+
+        public int UserId { get; set; }
+
+        public CustomIdentityUser? User { get; set; }
     }
 }
