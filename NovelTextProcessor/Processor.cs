@@ -25,14 +25,14 @@ namespace NovelTextProcessor
 		{
 			var englishSpans = _SplitTextToSpans(5000);
 
-			_MapEnglishSpansToListOfSpanAndEntityNames(ref englishSpans, ref listOfSpanAndEntityNames);
-			_SearchForEntityNamesInSpans(ref listOfSpanAndEntityNames);
-			_ReplaceAllEntityNamesInSpanToFixedName(ref listOfSpanAndEntityNames);
-			listOfSpanAndEntityNames = await TranslateAllSpansAsync(listOfSpanAndEntityNames); // now spans in listOfSpanAndEntityNames is translated but names is FixedNames and listOfSpanAndEntityNames.EntityName have original names
-			_RestoreOriginalNames(ref listOfSpanAndEntityNames); // now spans ready
+			_MapEnglishSpansToListOfSpanAndEntityNames(ref englishSpans);
+			_SearchForEntityNamesInSpans();
+			_ReplaceAllEntityNamesInSpanToFixedName();
+			await TranslateAllSpansAsync(); // now spans in listOfSpanAndEntityNames is translated but names is FixedNames and listOfSpanAndEntityNames.EntityName have original names
+			_RestoreOriginalNames(); // now spans ready
 		}
 
-		private void _RestoreOriginalNames(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
+		private void _RestoreOriginalNames()
 		{
 			for (int i = 0; i < listOfSpanAndEntityNames.Count; i++)
 			{
@@ -50,7 +50,7 @@ namespace NovelTextProcessor
 			}
 		}
 
-		private async Task<List<SpanAndEntityNames>> TranslateAllSpansAsync(List<SpanAndEntityNames> listOfSpanAndEntityNames)
+		private async Task TranslateAllSpansAsync()
 		{
 			var spans = listOfSpanAndEntityNames.Select(x => x.Span).ToList();
 			var pretranslateSpans = await TextTranslator.Instance.SendRequests(spans);
@@ -60,10 +60,9 @@ namespace NovelTextProcessor
 			{
 				listOfSpanAndEntityNames[i].Span = translatedSpans[i];
 			}
-			return listOfSpanAndEntityNames;
 		}
 
-		private void _ReplaceAllEntityNamesInSpanToFixedName(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
+		private void _ReplaceAllEntityNamesInSpanToFixedName()
 		{
 			for (int i = 0; i < listOfSpanAndEntityNames.Count; i++)
 			{
@@ -81,7 +80,7 @@ namespace NovelTextProcessor
 			}
 		}
 
-		private void _MapEnglishSpansToListOfSpanAndEntityNames(ref string[] englishSpans, ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
+		private void _MapEnglishSpansToListOfSpanAndEntityNames(ref string[] englishSpans)
 		{
 			foreach (var englishSpan in englishSpans)
 			{
@@ -96,7 +95,7 @@ namespace NovelTextProcessor
 		/// Search In All List of SpanAndEntityNames If Found Span Contain EntityName Than Add it To SpanAndEntityNames.EntityNames
 		/// </summary>
 		/// <param name="listOfSpanAndEntityNames"></param>
-		private void _SearchForEntityNamesInSpans(ref List<SpanAndEntityNames> listOfSpanAndEntityNames)
+		private void _SearchForEntityNamesInSpans()
 		{
 			for (int i = 0; i < listOfSpanAndEntityNames.Count; i++)
 			{
