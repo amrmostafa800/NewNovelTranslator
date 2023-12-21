@@ -15,7 +15,10 @@ namespace NovelTextProcessor
 		}
 		public static TextTranslator Instance { get; } = new TextTranslator();
 
-		public async Task<IEnumerable<string>> SendRequests(IEnumerable<string> arrayOfText)
+		int _retry = 0;
+		int _maxRetry = 20;
+
+		public async Task<IEnumerable<string>> SendRequestsAsync(IEnumerable<string> arrayOfText)
 		{
 			var tasks = new List<Task<string>>(); // Use List<Task<string>> for asynchronous tasks
 
@@ -77,12 +80,18 @@ namespace NovelTextProcessor
 
 			if (response.StatusCode == System.Net.HttpStatusCode.OK)
 			{
+				_retry = 0; // Reset Retry
 				JObject jsonObject = JObject.Parse(responseBody);
 
 				JToken translationToken = jsonObject.SelectToken("data.translation")!;
 				return translationToken!.ToString();
 			}
-			return null!;
+			else if (_retry >= _maxRetry)
+			{
+				return null!;
+			}
+			_retry++;
+			return await SendRequestAsync(Text);
 		}
 	}
 }

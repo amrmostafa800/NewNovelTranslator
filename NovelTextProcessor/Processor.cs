@@ -53,7 +53,7 @@ namespace NovelTextProcessor
 		private async Task TranslateAllSpansAsync()
 		{
 			var spans = listOfSpanAndEntityNames.Select(x => x.Span).ToList();
-			var pretranslateSpans = await TextTranslator.Instance.SendRequests(spans);
+			var pretranslateSpans = await TextTranslator.Instance.SendRequestsAsync(spans);
 			var translatedSpans = pretranslateSpans.ToArray();
 
 			for (int i = 0; i < translatedSpans.Length; i++)
