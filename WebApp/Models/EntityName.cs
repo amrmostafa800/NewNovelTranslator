@@ -10,7 +10,7 @@ namespace WebApp.Models
         [Column(TypeName = "VARCHAR"), MaxLength(300)]
         public required string Name { get; set; }
 
-        [Column(TypeName = "VARCHAR"), AllowedValues('M','F')] 
+        [Column(TypeName = "VARCHAR"), AllowedValues('M','F')]
         public required char Gender { get; set; }
 
         //public int NovelId { get; set; }

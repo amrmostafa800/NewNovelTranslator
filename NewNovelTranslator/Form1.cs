@@ -29,25 +29,9 @@ namespace NewNovelTranslator
 
             var seedData = new List<EntityName>
             {
-                //new EntityName { Name = "Alice", Gender = 'F' },
-                //new EntityName { Name = "Bob", Gender = 'M' },
-                //new EntityName { Name = "Charlie", Gender = 'M' },
-                //new EntityName { Name = "David", Gender = 'M' },
-                //new EntityName { Name = "Emily", Gender = 'F' },
-                //new EntityName { Name = "Felicia", Gender = 'F' },
-                //new EntityName { Name = "George", Gender = 'M' },
-                //new EntityName { Name = "Hannah", Gender = 'F' },
-                //new EntityName { Name = "Isaac", Gender = 'M' },
-                //new EntityName { Name = "Jessica", Gender = 'F' },
-                //new EntityName { Name = "Nicole", Gender = 'F' },
-                //new EntityName { Name = "Oliver", Gender = 'M' },
-                //new EntityName { Name = "Patricia", Gender = 'F' },
-                //new EntityName { Name = "Quentin", Gender = 'M' },
-                //new EntityName { Name = "Rachel", Gender = 'F' },
-                //new EntityName { Name = "Steven", Gender = 'M' },
-                new EntityName { EnglishName = "Kevin", ArabicName = "ﬂÌ›‰", Gender = 'M' },
-                new EntityName { EnglishName = "Laura", ArabicName = "·Ê—«", Gender = 'F' },
-                new EntityName { EnglishName = "Michael", ArabicName = "„«Ìﬂ·", Gender = 'M' },
+                new EntityName { EnglishName = "Angus", ArabicName = "√‰ÃÊ”", Gender = 'M' },
+                new EntityName { EnglishName = "Jayna", ArabicName = "ÃÌ‰«", Gender = 'F' },
+                new EntityName { EnglishName = "Jade", ArabicName = "Ã«Ìœ", Gender = 'M' },
             };
 
             Processor processor = new Processor(text.Text, seedData.ToArray());

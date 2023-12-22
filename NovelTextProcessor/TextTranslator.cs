@@ -47,7 +47,7 @@ namespace NovelTextProcessor
 			var requestBody = new TranslationRequestDto
 			{
 				multiline = true,
-				source = "", //if enpty api accept any lang
+				source = "en", //if enpty api accept any lang
 				target = "ar",
 				q = Text,
 				hints = "",

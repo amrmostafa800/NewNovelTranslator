@@ -105,32 +105,30 @@ namespace NovelTextProcessor
 
 		private List<EntityName> _SearchForEntityNamesInSpan(SpanAndEntityNames spanAndEntityNames)
 		{
-			while (true)
+			var entityNamesWithIndex = new Dictionary<int, EntityName>();
+			StringBuilder SpanAsStringBuilder = new StringBuilder(spanAndEntityNames.Span);
+
+			int currentIdex = 0;
+
+			for (int i = 0; i < _entityNames.Length; i++)
 			{
-				var currentEntityName = _GetFirstEntityNameInSpan(spanAndEntityNames.Span);
-
-				if (currentEntityName == null)
-					break;
-
-				spanAndEntityNames.EntityNames.Add(currentEntityName);
-				spanAndEntityNames.Span = spanAndEntityNames.Span.ReplaceFirst(currentEntityName.EnglishName, ""); // remove from span
-				currentEntityName = null;
-			}
-
-
-			return spanAndEntityNames.EntityNames;
-		}
-
-		private EntityName? _GetFirstEntityNameInSpan(string span)
-		{
-			foreach (var entityName in _entityNames)
-			{
-				if (span.Contains(entityName.EnglishName))
+				while (true)
 				{
-					return entityName;
+					currentIdex = SpanAsStringBuilder.ToString().IndexOf(_entityNames[i].EnglishName, currentIdex+1);// try find index of entity name if not found its return -1
+					//SpanAsStringBuilder.ReplaceFromTwoIndexToNewText(0, currentIdex + _entityNames[i].EnglishName.Length,""); // remove text from begining to entity name from string builder
+					if (currentIdex != -1) // check if found
+					{
+						entityNamesWithIndex.Add(currentIdex, _entityNames[i]);
+					}
+					else
+					{
+						break; // no more from this entity name in span
+					}	
 				}
 			}
-			return null;
+
+			//create SpanAndEntityNames.entitynames again to sort correct (low index first)
+			return spanAndEntityNames.EntityNames = entityNamesWithIndex.OrderBy(e => e.Key).Select(e => e.Value).ToList();
 		}
 
 		protected string[] _SplitTextToSpans()
@@ -175,20 +173,6 @@ namespace NovelTextProcessor
 			// Convert the list to an array
 			return stringList.ToArray();
 		}
-
-		//private int _CountHowMuchEntityNamesInSpan(string englishSpan)
-		//{
-		//    int count = 0;
-		//    for (int i = 0; i < _entityNames.Length; i++)
-		//    {
-		//        while (englishSpan.Contains(_entityNames[i].EnglishName))
-		//        {
-		//            count++;
-		//            englishSpan = englishSpan.ReplaceFirst(_entityNames[i].EnglishName, ""); // remove after count to dont count again
-		//        }
-		//    }
-		//    return count;
-		//}
 
 		private string _GenerateTextAfterAllEdits()
 		{
