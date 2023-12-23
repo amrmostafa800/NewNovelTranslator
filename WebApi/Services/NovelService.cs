@@ -18,67 +18,90 @@ namespace WebApi.Services
 		{
 			return _context.NovelUsers.Select(n => new NovelDto
 			{
-				Id = n.Id,
-				UserId = n.userId,
-				Name = n.Novel!.novel_Name 
+				Id = n.NovelCloneId,
+				UserId = n.UserId,
+				Name = n.NovelClone!.NovelName!.novelName 
 			}).ToList();
 		}
 
-		public async Task<Novel?> GetById(int id)
+		public NovelDto? GetById(int id)
 		{
-			return await _context.Novels.FirstOrDefaultAsync(n => n.Id == id);
+			return _context.NovelUsers.Where(n => n.NovelCloneId == id).Select(n => new NovelDto
+			{
+				Id = n.NovelCloneId,
+				UserId = n.UserId,
+				Name = n.NovelClone!.NovelName!.novelName
+			}).FirstOrDefault();
 		}
 
-		private async Task<int> _AddNovelIfNotExistElseReturnNovelId(string novelName)
+		private async Task<int> _AddNovelNameIfNotExistElseReturnNovelNameId(string novelName)
 		{
-			var novel = await _context.Novels.FirstOrDefaultAsync(n => n.novel_Name == novelName);
-			if (novel == null) 
+			var novelNameInfo = await _context.NovelNames.FirstOrDefaultAsync(n => n.novelName == novelName);
+			if (novelNameInfo == null) 
 			{
-				novel = new Novel()
+				novelNameInfo = new NovelName()
 				{
-					novel_Name = novelName
+					novelName = novelName
 				};
 
-				_context.Novels.Add(novel);
+				_context.NovelNames.Add(novelNameInfo);
 				_context.SaveChanges();
 			}
-			return novel.Id;
+			return novelNameInfo.Id;
 		}
 
 		// i make add novel in 2 table to Allow Create Same Novel By Deffrant Users and Allow more than one User Acsses to Edit This Novel Or Add Entity Names To It without repeat novel name
-		public async Task<int> AddNovel(string novelName,int UserIdWhoCreateNovel)
+		public async Task<int> AddNovel(string novelName, int UserIdWhoCreateNovel)
 		{
-			//Add Novel
-			int novelId = await _AddNovelIfNotExistElseReturnNovelId(novelName);
+			//Add NovelName
+			int novelNameId = await _AddNovelNameIfNotExistElseReturnNovelNameId(novelName);
 
-			//Check If NovelUser Is Exist (this user already have novel with this name)
-			if (_context.NovelUsers.Any(n => n.novelId == novelId && n.userId == UserIdWhoCreateNovel))
+			//Check If Novel Is Exist (this user already have novel with this name)
+			if (_context.NovelUsers.Any(n => n.NovelClone!.NovelNameId == novelNameId && n.UserId == UserIdWhoCreateNovel))
 			{
 				return 0;
 			}
-			//Add NovelUser
-			var novelUser = new NovelUsers()
+			//Add NovelClone
+			var novelClone = new NovelClone()
 			{
-				novelId = novelId,
-				userId = UserIdWhoCreateNovel
+				NovelNameId = novelNameId,
 			};
 
-			await _context.NovelUsers.AddAsync(novelUser);
+			await _context.NovelClones.AddAsync(novelClone);
 
 			await _context.SaveChangesAsync();
-			return novelUser.Id; // here return NovelUser.id not novel.id
+
+			//Add NovelUser
+			var novel = new NovelUser()
+			{
+				NovelCloneId = novelClone.Id,
+				UserId = UserIdWhoCreateNovel,
+			};
+
+			await _context.NovelUsers.AddAsync(novel);
+
+			await _context.SaveChangesAsync();
+			return novelClone.Id;
 		}
 
 		public async Task<bool> DeleteNovel(int id)
 		{
-			var novel = _context.NovelUsers.FirstOrDefault(n => n.Id == id);
-			if (novel == null)
+			//Try Get NovelClone
+			var novelClone = _context.NovelClones.FirstOrDefault(n => n.Id == id);
+			if (novelClone == null)
 			{
 				return false;
 			}
-			_context.NovelUsers.Remove(novel);
+
+			_context.NovelClones.Remove(novelClone); // Bycouse Cascade Delete Enabled Remove NovelClone Will Remove Novel Too
 			await _context.SaveChangesAsync();
 			return true;
 		}
+
+		public async Task<bool> IsUserOwnThisNovel(int novelId,int UserId)
+		{
+			var novel = await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelCloneId == novelId && n.UserId == UserId);
+			return novel != null;
+		} 
 	}
 }

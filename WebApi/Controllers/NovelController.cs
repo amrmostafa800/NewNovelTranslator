@@ -6,8 +6,6 @@ using WebApi.Responses;
 using WebApi.Services;
 using WebApp.Extensions;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace WebApi.Controllers
 {
 	[Route("api/[controller]")]
@@ -30,12 +28,12 @@ namespace WebApi.Controllers
 
 		// GET api/<NovelController>/5
 		[HttpGet("{id}")]
-		public async Task<IActionResult> Get(int id)
+		public IActionResult Get(int id)
 		{
-			var novel = await _novelService.GetById(id);
-			if (novel == null) 
+			var novel = _novelService.GetById(id);
+			if (novel == null)
 			{
-				return new ErrorResponse() 
+				return new ErrorResponse()
 				{
 					Description = "Novel Id Not Exist"
 				};
@@ -63,14 +61,34 @@ namespace WebApi.Controllers
 
 		// DELETE api/<NovelController>/5
 		[HttpDelete("{id}")]
+		[Authorize]
 		public async Task<IActionResult> Delete(int id)
 		{
-			var result = await _novelService.DeleteNovel(id);
-			if (!result)
+			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
+			var novel = _novelService.GetById(id);
+
+			if (novel == null) // check if novel not exist
 			{
 				return new ErrorResponse()
 				{
 					Description = "No Novel With This Id"
+				};
+			}
+
+			if (novel.UserId != userId) //check if current User Have Permission To Delete This NovelClone
+			{
+				return new ErrorResponse()
+				{
+					Description = "You Cant Delete Novel Without Have Permission On It"
+				};
+			}
+
+			var isDeleted = await _novelService.DeleteNovel(id);
+			if (!isDeleted)
+			{
+				return new ErrorResponse()
+				{
+					Description = "Unknown Error"
 				};
 			}
 			return Ok("Deleted");

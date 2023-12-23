@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApi.Data;
 
@@ -11,9 +12,11 @@ using WebApi.Data;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231223182709_Update_Novels2")]
+    partial class Update_Novels2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,6 +230,29 @@ namespace WebApi.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("WebApi.Models.Novel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("NovelCloneId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NovelCloneId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Novels");
+                });
+
             modelBuilder.Entity("WebApi.Models.NovelClone", b =>
                 {
                     b.Property<int>("Id")
@@ -261,29 +287,6 @@ namespace WebApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("NovelNames");
-                });
-
-            modelBuilder.Entity("WebApi.Models.NovelUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("NovelCloneId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NovelCloneId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("NovelUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -337,18 +340,7 @@ namespace WebApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WebApi.Models.NovelClone", b =>
-                {
-                    b.HasOne("WebApi.Models.NovelName", "NovelName")
-                        .WithMany()
-                        .HasForeignKey("NovelNameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("NovelName");
-                });
-
-            modelBuilder.Entity("WebApi.Models.NovelUser", b =>
+            modelBuilder.Entity("WebApi.Models.Novel", b =>
                 {
                     b.HasOne("WebApi.Models.NovelClone", "NovelClone")
                         .WithMany()
@@ -365,6 +357,17 @@ namespace WebApi.Migrations
                     b.Navigation("NovelClone");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("WebApi.Models.NovelClone", b =>
+                {
+                    b.HasOne("WebApi.Models.NovelName", "NovelName")
+                        .WithMany()
+                        .HasForeignKey("NovelNameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("NovelName");
                 });
 #pragma warning restore 612, 618
         }

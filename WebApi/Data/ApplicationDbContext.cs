@@ -12,7 +12,8 @@ namespace WebApi.Data
 		{
 		}
 
-        public DbSet<Novel> Novels { get; set; }
-        public DbSet<NovelUsers> NovelUsers { get; set; }
+        public DbSet<NovelName> NovelNames { get; set; }
+        public DbSet<NovelClone> NovelClones { get; set; }
+        public DbSet<NovelUser> NovelUsers { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApi.Data;
 
@@ -11,9 +12,11 @@ using WebApi.Data;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231223162545_Update_Novels_And_NovelNames")]
+    partial class Update_Novels_And_NovelNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,25 +230,7 @@ namespace WebApi.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("WebApi.Models.NovelClone", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("NovelNameId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NovelNameId");
-
-                    b.ToTable("NovelClones");
-                });
-
-            modelBuilder.Entity("WebApi.Models.NovelName", b =>
+            modelBuilder.Entity("WebApi.Models.NovelNames", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -263,7 +248,7 @@ namespace WebApi.Migrations
                     b.ToTable("NovelNames");
                 });
 
-            modelBuilder.Entity("WebApi.Models.NovelUser", b =>
+            modelBuilder.Entity("WebApi.Models.Novels", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -271,19 +256,22 @@ namespace WebApi.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("NovelCloneId")
+                    b.Property<int?>("NovelNamesId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
+                    b.Property<int>("novelNameId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("userId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NovelCloneId");
+                    b.HasIndex("NovelNamesId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("userId");
 
-                    b.ToTable("NovelUsers");
+                    b.ToTable("Novels");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
@@ -337,32 +325,19 @@ namespace WebApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WebApi.Models.NovelClone", b =>
+            modelBuilder.Entity("WebApi.Models.Novels", b =>
                 {
-                    b.HasOne("WebApi.Models.NovelName", "NovelName")
+                    b.HasOne("WebApi.Models.NovelNames", "NovelNames")
                         .WithMany()
-                        .HasForeignKey("NovelNameId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("NovelName");
-                });
-
-            modelBuilder.Entity("WebApi.Models.NovelUser", b =>
-                {
-                    b.HasOne("WebApi.Models.NovelClone", "NovelClone")
-                        .WithMany()
-                        .HasForeignKey("NovelCloneId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("NovelNamesId");
 
                     b.HasOne("WebApi.Data.CustomIdentityUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("userId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("NovelClone");
+                    b.Navigation("NovelNames");
 
                     b.Navigation("User");
                 });
