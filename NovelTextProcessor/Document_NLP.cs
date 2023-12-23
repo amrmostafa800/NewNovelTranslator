@@ -1,18 +1,23 @@
 ﻿using Catalyst;
 using Catalyst.Models;
 using Mosaik.Core;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace NovelTextProcessor
 {
 	public class Document_NLP
 	{
 		Pipeline _nlp;
-		public Document document;
-		public Document_NLP(string text)
+		public Document document = null!;
+		public Document_NLP()
 		{
 			English.Register();
 			_nlp = Pipeline.For(Language.English);
-			_nlp.Add(AveragePerceptronEntityRecognizer.FromStoreAsync(language: Language.English, version: Mosaik.Core.Version.Latest, tag: "WikiNER").Result);
+		}
+
+		public async Task RunAsync(string text)
+		{
+			_nlp.Add(await AveragePerceptronEntityRecognizer.FromStoreAsync(language: Language.English, version: Mosaik.Core.Version.Latest, tag: "WikiNER"));
 			document = new Document(text.Trim(), Language.English);
 			_nlp.ProcessSingle(document);
 		}
