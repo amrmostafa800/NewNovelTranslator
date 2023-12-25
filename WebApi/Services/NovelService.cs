@@ -18,19 +18,19 @@ namespace WebApi.Services
 		{
 			return _context.NovelUsers.Select(n => new NovelDto
 			{
-				Id = n.NovelCloneId,
+				Id = n.NovelId,
 				UserId = n.UserId,
-				Name = n.NovelClone!.NovelName!.novelName 
+				Name = n.Novel!.NovelName!.novelName 
 			}).ToList();
 		}
 
 		public NovelDto? GetById(int id)
 		{
-			return _context.NovelUsers.Where(n => n.NovelCloneId == id).Select(n => new NovelDto
+			return _context.NovelUsers.Where(n => n.NovelId == id).Select(n => new NovelDto
 			{
-				Id = n.NovelCloneId,
+				Id = n.NovelId,
 				UserId = n.UserId,
-				Name = n.NovelClone!.NovelName!.novelName
+				Name = n.Novel!.NovelName!.novelName
 			}).FirstOrDefault();
 		}
 
@@ -57,7 +57,7 @@ namespace WebApi.Services
 			int novelNameId = await _AddNovelNameIfNotExistElseReturnNovelNameId(novelName);
 
 			//Check If Novel Is Exist (this user already have novel with this name)
-			if (_context.NovelUsers.Any(n => n.NovelClone!.NovelNameId == novelNameId && n.UserId == UserIdWhoCreateNovel))
+			if (_context.NovelUsers.Any(n => n.Novel!.NovelNameId == novelNameId && n.UserId == UserIdWhoCreateNovel))
 			{
 				return 0;
 			}
@@ -74,7 +74,7 @@ namespace WebApi.Services
 			//Add NovelUser
 			var novel = new NovelUser()
 			{
-				NovelCloneId = novelClone.Id,
+				NovelId = novelClone.Id,
 				UserId = UserIdWhoCreateNovel,
 			};
 
@@ -100,7 +100,7 @@ namespace WebApi.Services
 
 		public async Task<bool> IsUserOwnThisNovel(int novelId,int UserId)
 		{
-			var novel = await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelCloneId == novelId && n.UserId == UserId);
+			var novel = await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelId == novelId && n.UserId == UserId);
 			return novel != null;
 		} 
 	}
