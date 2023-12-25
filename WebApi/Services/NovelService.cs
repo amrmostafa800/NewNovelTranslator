@@ -61,13 +61,13 @@ namespace WebApi.Services
 			{
 				return 0;
 			}
-			//Add NovelClone
-			var novelClone = new NovelClone()
+			//Add Novel
+			var novelClone = new Novel()
 			{
 				NovelNameId = novelNameId,
 			};
 
-			await _context.NovelClones.AddAsync(novelClone);
+			await _context.Novels.AddAsync(novelClone);
 
 			await _context.SaveChangesAsync();
 
@@ -86,14 +86,14 @@ namespace WebApi.Services
 
 		public async Task<bool> DeleteNovel(int id)
 		{
-			//Try Get NovelClone
-			var novelClone = _context.NovelClones.FirstOrDefault(n => n.Id == id);
+			//Try Get Novel
+			var novelClone = _context.Novels.FirstOrDefault(n => n.Id == id);
 			if (novelClone == null)
 			{
 				return false;
 			}
 
-			_context.NovelClones.Remove(novelClone); // Bycouse Cascade Delete Enabled Remove NovelClone Will Remove Novel Too
+			_context.Novels.Remove(novelClone); // Bycouse Cascade Delete Enabled Remove Novel Will Remove Novel Too
 			await _context.SaveChangesAsync();
 			return true;
 		}

@@ -2,7 +2,7 @@
 
 namespace WebApi.Models
 {
-    public class NovelClone
+    public class Novel
     {
         public int Id { get; set; }
         public int NovelNameId { get; set; }

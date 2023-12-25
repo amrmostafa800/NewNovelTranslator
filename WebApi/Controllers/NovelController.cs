@@ -74,7 +74,7 @@ namespace WebApi.Controllers
 				};
 			}
 
-			if (novel.UserId != userId) //check if current User Have Permission To Delete This NovelClone
+			if (novel.UserId != userId) //check if current User Have Permission To Delete This Novel
 			{
 				return new ErrorResponse()
 				{
