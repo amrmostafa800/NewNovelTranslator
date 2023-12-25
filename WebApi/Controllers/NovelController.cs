@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using WebApi.Models;
 using WebApi.Responses;
 using WebApi.Services;
 using WebApp.Extensions;

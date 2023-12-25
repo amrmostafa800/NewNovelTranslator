@@ -7,9 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject", "NewNovelTran
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NovelTextProcessor", "NovelTextProcessor\NovelTextProcessor.csproj", "{D4B37E21-D1B9-4F8C-9C09-17330C280747}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp", "WebApp\WebApp.csproj", "{5383D264-2215-44C7-96EA-04755DD6E932}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "WebApi\WebApi.csproj", "{19FBECED-5175-4FA6-AA04-DD1B78F270E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{19FBECED-5175-4FA6-AA04-DD1B78F270E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +23,6 @@ Global
 		{D4B37E21-D1B9-4F8C-9C09-17330C280747}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4B37E21-D1B9-4F8C-9C09-17330C280747}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4B37E21-D1B9-4F8C-9C09-17330C280747}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5383D264-2215-44C7-96EA-04755DD6E932}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5383D264-2215-44C7-96EA-04755DD6E932}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5383D264-2215-44C7-96EA-04755DD6E932}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5383D264-2215-44C7-96EA-04755DD6E932}.Release|Any CPU.Build.0 = Release|Any CPU
 		{19FBECED-5175-4FA6-AA04-DD1B78F270E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{19FBECED-5175-4FA6-AA04-DD1B78F270E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19FBECED-5175-4FA6-AA04-DD1B78F270E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
