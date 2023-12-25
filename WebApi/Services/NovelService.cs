@@ -93,7 +93,7 @@ namespace WebApi.Services
 				return false;
 			}
 
-			_context.Novels.Remove(novelClone); // Bycouse Cascade Delete Enabled Remove Novel Will Remove Novel Too
+			_context.Novels.Remove(novelClone); // Bycouse Cascade Delete Enabled Remove Novel Will Remove NovelUsers Too
 			await _context.SaveChangesAsync();
 			return true;
 		}
