@@ -1,8 +1,11 @@
 
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
+using WebApi.DTOs;
 using WebApi.Services;
+using WebApi.Validators;
 
 namespace WebApi
 {
@@ -28,6 +31,7 @@ namespace WebApi
 			builder.Services.AddSwaggerGen();
 
 			builder.Services.AddScoped<NovelService>();
+			builder.Services.AddScoped<IValidator<CreateNovelDto>, CreateNovelValidator>();
 
 			var app = builder.Build();
 

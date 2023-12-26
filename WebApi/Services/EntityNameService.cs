@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NovelTextProcessor;
+using System.Xml.Linq;
 using WebApi.Data;
-using WebApi.DTOs;
 using WebApi.Models;
 
 namespace WebApi.Services
@@ -19,33 +20,37 @@ namespace WebApi.Services
 			return _context.EntityNames.Where(n => n.NovelId == novelId).OrderBy(n => n.EnglishName.Length).ToList();
 		}
 
-		public int AddEntityName(string enName,char gender,int novelId)
+		public async Task<int> AddEntityName(string enName,char gender,int novelId)
 		{
 			var entityName = new EntityName()
 			{
 				EnglishName = enName,
-				ArabicName = "TDO", //TDO translate english Name here To Get Arabic Name
+				ArabicName = await TextTranslator.Instance.SendRequestAsync(enName),
 				Gender = gender,
 				NovelId = novelId,
 			};
 
 			_context.EntityNames.Add(entityName);
-			if (_context.SaveChanges() != 0)
+			if (await _context.SaveChangesAsync() != 0)
 			{
 				return entityName.Id;
 			}
 			return 0; // failed
 		}
 
-		public bool UpdateEntityName(int id,string NewEnglishName)
+		public async Task<bool> UpdateEntityName(int id, string newEnglishName, char gender)
 		{
 			var entityName = _context.EntityNames.FirstOrDefault(n => n.Id == id);
 			if (entityName == null) 
 			{
 				return false;
 			}
-			entityName.EnglishName = NewEnglishName;
-			entityName.ArabicName = "TDO"; //TDO translate english Name here To Get Arabic Name
+			entityName.EnglishName = newEnglishName;
+			entityName.Gender = gender;
+			entityName.ArabicName = await TextTranslator.Instance.SendRequestAsync(newEnglishName);
+
+			_context.EntityNames.Update(entityName);
+			await _context.SaveChangesAsync();
 			return true;
 		}
 

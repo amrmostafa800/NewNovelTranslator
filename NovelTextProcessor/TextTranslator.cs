@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 
 namespace NovelTextProcessor
 {
-	internal class TextTranslator // TDO Use Paging to control Amount Of Thereds
+	public class TextTranslator // TDO Use Paging to control Amount Of Thereds
 	{
 		private readonly HttpClient httpClient;
 
@@ -37,7 +37,7 @@ namespace NovelTextProcessor
 			return results;
 		}
 
-		protected async Task<string> SendRequestAsync(string Text)
+		public async Task<string> SendRequestAsync(string Text)
 		{
 			var timeTicks = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 			var verifyToken = $"webkey_E3sTuMjpP8Jez49GcYpDVH7r#{timeTicks}#{Text}";

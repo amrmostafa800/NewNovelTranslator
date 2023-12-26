@@ -20,6 +20,7 @@ namespace WebApi.Services
 			{
 				Id = n.NovelId,
 				UserId = n.UserId,
+				UserName = n.User!.UserName!,
 				Name = n.Novel!.NovelName!.novelName 
 			}).ToList();
 		}
@@ -30,6 +31,7 @@ namespace WebApi.Services
 			{
 				Id = n.NovelId,
 				UserId = n.UserId,
+				UserName = n.User!.UserName!,
 				Name = n.Novel!.NovelName!.novelName
 			}).FirstOrDefault();
 		}

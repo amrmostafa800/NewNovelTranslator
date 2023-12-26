@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using WebApi.DTOs;
 using WebApi.Responses;
 using WebApi.Services;
 using WebApp.Extensions;
@@ -12,10 +15,12 @@ namespace WebApi.Controllers
 	public class NovelController : ControllerBase
 	{
 		private readonly NovelService _novelService;
+		private readonly IValidator<CreateNovelDto> _createNovelValidator;
 
-		public NovelController(NovelService novelService)
+		public NovelController(NovelService novelService, IValidator<CreateNovelDto> createNovelValidator)
 		{
 			_novelService = novelService;
+			_createNovelValidator = createNovelValidator;
 		}
 
 		// GET: api/<NovelController>
@@ -43,11 +48,18 @@ namespace WebApi.Controllers
 		// POST api/<NovelController>
 		[HttpPost]
 		[Authorize]
-		public async Task<IActionResult> Create([FromBody] string novelName)
+		public async Task<IActionResult> Create([FromBody] CreateNovelDto novelDto)
 		{
+			ValidationResult validationResult = await _createNovelValidator.ValidateAsync(novelDto);
+
+			if (!validationResult.IsValid)
+			{
+				return BadRequest(validationResult.Errors);
+			}
+
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
 
-			var novelUserId = await _novelService.AddNovel(novelName, userId);
+			var novelUserId = await _novelService.AddNovel(novelDto.NovelName, userId);
 			if (novelUserId == 0)
 			{
 				return new ErrorResponse()
