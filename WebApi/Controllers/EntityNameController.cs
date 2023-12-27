@@ -1,6 +1,7 @@
 ﻿using Azure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NovelTextProcessor.Dtos;
 using System.Security.Claims;
 using WebApi.DTOs;
 using WebApi.Models;
@@ -30,16 +31,17 @@ namespace WebApi.Controllers
 		[Authorize]
 		public async Task<IActionResult> Create([FromBody] EntityNameDto entityName)
 		{
-			//TDO First Check if user have acsses on this novel or not
-			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
-			var novelUserIdOfThisEntity = _novelService.GetById(entityName.NovelId)?.UserId;
-			if (userId != novelUserIdOfThisEntity)
+			//Check if user have acsses on this novel or not
+			var novelUserIdOfThisEntity = _novelService.GetById(entityName.NovelId)!.UserId;
+			if (_IsUserHaveAcsses(novelUserIdOfThisEntity))
 			{
 				return new ErrorResponse()
 				{
 					Description = "You Dont Have Permission On This Novel",
 				};
 			}
+
+			//Add To database
 
 			var entityNameId = await _entityNameService.AddEntityName(entityName.EnglishName,entityName.Gender,entityName.NovelId);
 			if (entityNameId != 0) // If Add Not Failed
@@ -54,16 +56,50 @@ namespace WebApi.Controllers
 
 		// PUT api/<EntityNameController>/5
 		[HttpPut("{id}")]
-		public async Task Update(int id, [FromBody] string NewEnglishName,char gender)
+		[Authorize]
+		public async Task<IActionResult> Update(int id, [FromBody] string NewEnglishName,char gender)
 		{
-			await _entityNameService.UpdateEntityName(id, NewEnglishName, gender); //TDO make it need auth and validate if auth id have acsses on this entity or not by Join Novel by novelId
+			//Check For permission
+			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
+			if (_entityNameService.CheckIfNovelUserIdsOfThisEntityNameEqualThisNovelUserId(id, userId))
+			{
+				return new ErrorResponse()
+				{
+					Description = "You Dont Have Permission On This Novel",
+				};
+			}
+
+			await _entityNameService.UpdateEntityName(id, NewEnglishName, gender);
+			return Ok("Edited");
 		}
 
 		// DELETE api/<EntityNameController>/5
 		[HttpDelete("{id}")]
-		public void Delete(int id)
+		[Authorize]
+		public IActionResult Delete(int id)
 		{
-			_entityNameService.DeleteEntityName(id); //TDO make it need auth and validate if auth id have acsses on this entity or not
+			//Check For permission
+			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
+			if (_entityNameService.CheckIfNovelUserIdsOfThisEntityNameEqualThisNovelUserId(id, userId))
+			{
+				return new ErrorResponse()
+				{
+					Description = "You Dont Have Permission On This Novel",
+				};
+			}
+
+			_entityNameService.DeleteEntityName(id);
+			return NoContent();
+		}
+
+		private bool _IsUserHaveAcsses(int novelUserId)
+		{
+			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
+			if (userId != novelUserId)
+			{
+				return false;
+			}
+			return true;
 		}
 	}
 }

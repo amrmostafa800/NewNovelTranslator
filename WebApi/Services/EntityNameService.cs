@@ -58,5 +58,17 @@ namespace WebApi.Services
 		{
 			return _context.EntityNames.Where(e => e.Id == entityNameId).ExecuteDelete() != 0;
 		}
+
+		public bool CheckIfNovelUserIdsOfThisEntityNameEqualThisNovelUserId(int entityNameId, int currentAuthUserId) // i do it with this why bycouse novel can have more than 1 user
+		{
+			var novelId = _context.EntityNames.FirstOrDefault(e => e.Id == entityNameId)!.NovelId;
+			var novelUsersId = _context.NovelUsers.Where(n => n.NovelId == novelId).ToArray();
+
+			if (novelUsersId.Any(n => n.UserId == currentAuthUserId))
+			{
+				return true;
+			}
+			return false;
+		}
 	}
 }
