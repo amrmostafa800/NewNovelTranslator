@@ -33,7 +33,7 @@ namespace WebApi.Controllers
 		{
 			//Check if user have acsses on this novel or not
 			var novelUserIdOfThisEntity = _novelService.GetById(entityName.NovelId)!.UserId;
-			if (_IsUserHaveAcsses(novelUserIdOfThisEntity))
+			if (!_IsUserHaveAcsses(novelUserIdOfThisEntity))
 			{
 				return new ErrorResponse()
 				{
@@ -57,11 +57,11 @@ namespace WebApi.Controllers
 		// PUT api/<EntityNameController>/5
 		[HttpPut("{id}")]
 		[Authorize]
-		public async Task<IActionResult> Update(int id, [FromBody] string NewEnglishName,char gender)
+		public async Task<IActionResult> Update(int id, [FromBody] string NewEnglishName,char gender) //TDO i think i will make only gender EditAble Here Later To Dont Broke Replace Bycouse Replace i will order by length (if i dont it will bug when have name first only in line and other line with first last) so better make only gender editAble or ReOrderBy every edit (i will look at it when Finsh NLP NER Controller)
 		{
 			//Check For permission
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
-			if (_entityNameService.CheckIfNovelUserIdsOfThisEntityNameEqualThisNovelUserId(id, userId))
+			if (!_entityNameService.CheckIfNovelUserIdsOfThisEntityNameEqualThisNovelUserId(id, userId))
 			{
 				return new ErrorResponse()
 				{
@@ -80,7 +80,7 @@ namespace WebApi.Controllers
 		{
 			//Check For permission
 			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
-			if (_entityNameService.CheckIfNovelUserIdsOfThisEntityNameEqualThisNovelUserId(id, userId))
+			if (!_entityNameService.CheckIfNovelUserIdsOfThisEntityNameEqualThisNovelUserId(id, userId))
 			{
 				return new ErrorResponse()
 				{

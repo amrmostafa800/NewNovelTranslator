@@ -31,6 +31,7 @@ namespace WebApi
 			builder.Services.AddSwaggerGen();
 
 			builder.Services.AddScoped<NovelService>();
+			builder.Services.AddScoped<EntityNameService>();
 			builder.Services.AddScoped<IValidator<CreateNovelDto>, CreateNovelValidator>();
 
 			var app = builder.Build();
