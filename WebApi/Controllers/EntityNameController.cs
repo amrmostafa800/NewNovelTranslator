@@ -22,9 +22,9 @@ namespace WebApi.Controllers
 		}
 
 		// POST api/<EntityNameController>
-		[HttpPost]
+		[HttpPost()]
 		[Authorize]
-		public async Task<IActionResult> Create([FromBody] EntityNameDto entityName)
+		public async Task<IActionResult> CreateMany([FromBody] EntityNameDto entityName)
 		{
 			//Check if user have acsses on this novel or not
 			var novelUserIdOfThisEntity = _novelService.GetById(entityName.NovelId)!.UserId;
@@ -37,14 +37,14 @@ namespace WebApi.Controllers
 			}
 
 			//Add To database
-			var entityNameId = await _entityNameService.AddEntityName(entityName.EnglishName, entityName.Gender, entityName.NovelId);
-			if (entityNameId != 0) // If Add Not Failed
+			var entityNamesAddResult = await _entityNameService.AddManyEntityNames(entityName);
+			if (entityNamesAddResult) // If Add Not Failed
 			{
-				return Ok($"Created Id:{entityNameId}");
+				return Ok($"Created Id:{entityNamesAddResult}");
 			}
 			return new ErrorResponse()
 			{
-				Description = "Unknown Error",
+				Description = "One Of EntityNames Or More Exist",
 			};
 		}
 

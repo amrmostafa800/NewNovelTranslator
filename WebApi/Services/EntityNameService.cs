@@ -1,6 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.ML;
 using NovelTextProcessor;
+using System.Xml.Linq;
 using WebApi.Data;
+using WebApi.DTOs;
 using WebApi.Models;
 
 namespace WebApi.Services
@@ -19,23 +22,52 @@ namespace WebApi.Services
 			return _context.EntityNames.Where(n => n.NovelId == novelId).OrderBy(n => n.EnglishName.Length).ToList();
 		}
 
-		public async Task<int> AddEntityName(string enName, char gender, int novelId)
+		public async Task<bool> AddManyEntityNames(EntityNameDto entityNameDto)
 		{
-			var entityName = new EntityName()
-			{
-				EnglishName = enName,
-				ArabicName = await TextTranslator.Instance.SendRequestAsync(enName),
-				Gender = gender,
-				NovelId = novelId,
-			};
+			//Check If any EntityName Already Exist
+			var englishNamesToCheck = entityNameDto.EntityNames.Select(en => en.EnglishName).ToList();
 
-			_context.EntityNames.Add(entityName);
+			var isAnyEntityNameExistBefore = await _context.EntityNames
+				.AnyAsync(e => englishNamesToCheck.Contains(e.EnglishName) && e.NovelId == entityNameDto.NovelId);
+
+			if (isAnyEntityNameExistBefore) // if found EntityName Exist return false
+				return false;
+
+			//Add EntityNames
+			var entityNamesTask = entityNameDto.EntityNames.Select(async e => new EntityName
+			{
+				EnglishName = e.EnglishName,
+				ArabicName = await TextTranslator.Instance.SendRequestAsync(e.EnglishName),
+				Gender = e.Gender,
+				NovelId = entityNameDto.NovelId
+			}).ToList();
+			var entityNames = await Task.WhenAll(entityNamesTask);
+
+			_context.EntityNames.AddRange(entityNames);
 			if (await _context.SaveChangesAsync() != 0)
 			{
-				return entityName.Id;
+				return true;
 			}
-			return 0; // failed
+			return false; // failed
 		}
+
+		//public async Task<int> AddEntityName(string enName, char gender, int novelId)
+		//{
+		//	var entityName = new EntityName()
+		//	{
+		//		EnglishName = enName,
+		//		ArabicName = await TextTranslator.Instance.SendRequestAsync(enName),
+		//		Gender = gender,
+		//		NovelId = novelId,
+		//	};
+
+		//	_context.EntityNames.Add(entityName);
+		//	if (await _context.SaveChangesAsync() != 0)
+		//	{
+		//		return entityName.Id;
+		//	}
+		//	return 0; // failed
+		//}
 
 		public async Task<bool> UpdateEntityName(int id, string newEnglishName, char gender)
 		{
