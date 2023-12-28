@@ -12,7 +12,7 @@ namespace WebApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class NovelController : ControllerBase
+	public class NovelController : ControllerBase //TDO use DataProtectionProvider to create protector to encrypt ID
 	{
 		private readonly NovelService _novelService;
 		private readonly IValidator<CreateNovelDto> _createNovelValidator;

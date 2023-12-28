@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApi.Models
 {
@@ -12,11 +12,11 @@ namespace WebApi.Models
 
 		public string? ArabicName { get; set; }
 
-		[AllowedValues('M','F')]
+		[AllowedValues('M', 'F')]
 		public required char Gender { get; set; }
 
-        public int NovelId { get; set; }
+		public int NovelId { get; set; }
 
-        public Novel? Novel { get; set; }
-    }
+		public Novel? Novel { get; set; }
+	}
 }

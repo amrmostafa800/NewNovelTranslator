@@ -1,6 +1,5 @@
 
 using FluentValidation;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
 using WebApi.DTOs;

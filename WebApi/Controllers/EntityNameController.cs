@@ -1,21 +1,16 @@
-﻿using Azure;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NovelTextProcessor.Dtos;
 using System.Security.Claims;
 using WebApi.DTOs;
-using WebApi.Models;
 using WebApi.Responses;
 using WebApi.Services;
 using WebApp.Extensions;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace WebApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class EntityNameController : ControllerBase //TDO need many edits
+	public class EntityNameController : ControllerBase //TDO need many edits - use DataProtectionProvider to create protector to encrypt ID
 	{
 		EntityNameService _entityNameService;
 		NovelService _novelService;
@@ -42,8 +37,7 @@ namespace WebApi.Controllers
 			}
 
 			//Add To database
-
-			var entityNameId = await _entityNameService.AddEntityName(entityName.EnglishName,entityName.Gender,entityName.NovelId);
+			var entityNameId = await _entityNameService.AddEntityName(entityName.EnglishName, entityName.Gender, entityName.NovelId);
 			if (entityNameId != 0) // If Add Not Failed
 			{
 				return Ok($"Created Id:{entityNameId}");
@@ -57,10 +51,10 @@ namespace WebApi.Controllers
 		// PUT api/<EntityNameController>/5
 		[HttpPut("{id}")]
 		[Authorize]
-		public async Task<IActionResult> Update(int id, [FromBody] string NewEnglishName,char gender) //TDO i think i will make only gender EditAble Here Later To Dont Broke Replace Bycouse Replace i will order by length (if i dont it will bug when have name first only in line and other line with first last) so better make only gender editAble or ReOrderBy every edit (i will look at it when Finsh NLP NER Controller)
+		public async Task<IActionResult> Update(int id, [FromBody] string NewEnglishName, char gender) //TDO i think i will make only gender EditAble Here Later To Dont Broke Replace Bycouse Replace i will order by length (if i dont it will bug when have name first only in line and other line with first last) so better make only gender editAble or ReOrderBy every edit (i will look at it when Finsh NLP NER Controller)
 		{
 			//Check For permission
-			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
+			var userId = _GetCurrentUserId();
 			if (!_entityNameService.CheckIfNovelUserIdsOfThisEntityNameEqualThisNovelUserId(id, userId))
 			{
 				return new ErrorResponse()
@@ -79,7 +73,7 @@ namespace WebApi.Controllers
 		public IActionResult Delete(int id)
 		{
 			//Check For permission
-			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
+			var userId = _GetCurrentUserId();
 			if (!_entityNameService.CheckIfNovelUserIdsOfThisEntityNameEqualThisNovelUserId(id, userId))
 			{
 				return new ErrorResponse()
@@ -94,12 +88,14 @@ namespace WebApi.Controllers
 
 		private bool _IsUserHaveAcsses(int novelUserId)
 		{
-			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
+			var userId = _GetCurrentUserId();
 			if (userId != novelUserId)
 			{
 				return false;
 			}
 			return true;
 		}
+
+		private int _GetCurrentUserId() => User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
 	}
 }

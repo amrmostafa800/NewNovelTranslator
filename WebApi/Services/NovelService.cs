@@ -14,14 +14,14 @@ namespace WebApi.Services
 			_context = context;
 		}
 
-		public List<NovelDto> GetAllNovels() 
+		public List<NovelDto> GetAllNovels()
 		{
 			return _context.NovelUsers.Select(n => new NovelDto
 			{
 				Id = n.NovelId,
 				UserId = n.UserId,
 				UserName = n.User!.UserName!,
-				Name = n.Novel!.NovelName!.novelName 
+				Name = n.Novel!.NovelName!.novelName
 			}).ToList();
 		}
 
@@ -39,7 +39,7 @@ namespace WebApi.Services
 		private async Task<int> _AddNovelNameIfNotExistElseReturnNovelNameId(string novelName)
 		{
 			var novelNameInfo = await _context.NovelNames.FirstOrDefaultAsync(n => n.novelName == novelName);
-			if (novelNameInfo == null) 
+			if (novelNameInfo == null)
 			{
 				novelNameInfo = new NovelName()
 				{
@@ -100,10 +100,10 @@ namespace WebApi.Services
 			return true;
 		}
 
-		public async Task<bool> IsUserOwnThisNovel(int novelId,int UserId)
+		public async Task<bool> IsUserOwnThisNovel(int novelId, int UserId)
 		{
 			var novel = await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelId == novelId && n.UserId == UserId);
 			return novel != null;
-		} 
+		}
 	}
 }

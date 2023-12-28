@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NovelTextProcessor;
-using System.Xml.Linq;
 using WebApi.Data;
 using WebApi.Models;
 
@@ -20,7 +19,7 @@ namespace WebApi.Services
 			return _context.EntityNames.Where(n => n.NovelId == novelId).OrderBy(n => n.EnglishName.Length).ToList();
 		}
 
-		public async Task<int> AddEntityName(string enName,char gender,int novelId)
+		public async Task<int> AddEntityName(string enName, char gender, int novelId)
 		{
 			var entityName = new EntityName()
 			{
@@ -41,7 +40,7 @@ namespace WebApi.Services
 		public async Task<bool> UpdateEntityName(int id, string newEnglishName, char gender)
 		{
 			var entityName = _context.EntityNames.FirstOrDefault(n => n.Id == id);
-			if (entityName == null) 
+			if (entityName == null)
 			{
 				return false;
 			}
@@ -54,7 +53,7 @@ namespace WebApi.Services
 			return true;
 		}
 
-		public bool DeleteEntityName(int entityNameId) 
+		public bool DeleteEntityName(int entityNameId)
 		{
 			return _context.EntityNames.Where(e => e.Id == entityNameId).ExecuteDelete() != 0;
 		}
