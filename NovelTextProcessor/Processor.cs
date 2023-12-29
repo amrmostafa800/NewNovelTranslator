@@ -114,8 +114,8 @@ namespace NovelTextProcessor
 			{
 				while (true)
 				{
-					currentIdex = SpanAsStringBuilder.ToString().IndexOf(_entityNames[i].EnglishName, currentIdex+1);// try find index of entity name if not found its return -1
-					//SpanAsStringBuilder.ReplaceFromTwoIndexToNewText(0, currentIdex + _entityNames[i].EnglishName.Length,""); // remove text from begining to entity name from string builder
+					currentIdex = SpanAsStringBuilder.ToString().IndexOf(_entityNames[i].EnglishName, currentIdex + 1);// try find index of entity name if not found its return -1
+																													   //SpanAsStringBuilder.ReplaceFromTwoIndexToNewText(0, currentIdex + _entityNames[i].EnglishName.Length,""); // remove text from begining to entity name from string builder
 					if (currentIdex != -1) // check if found
 					{
 						entityNamesWithIndex.Add(currentIdex, _entityNames[i]);
@@ -123,7 +123,7 @@ namespace NovelTextProcessor
 					else
 					{
 						break; // no more from this entity name in span
-					}	
+					}
 				}
 			}
 

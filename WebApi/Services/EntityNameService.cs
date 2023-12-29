@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.ML;
 using NovelTextProcessor;
-using System.Xml.Linq;
 using WebApi.Data;
 using WebApi.DTOs;
 using WebApi.Models;

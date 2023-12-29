@@ -1,7 +1,6 @@
 ﻿using Catalyst;
 using Catalyst.Models;
 using Mosaik.Core;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace NovelTextProcessor
 {

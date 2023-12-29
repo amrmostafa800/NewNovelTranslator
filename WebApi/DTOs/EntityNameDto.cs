@@ -4,8 +4,8 @@ namespace WebApi.DTOs
 {
 	public class EntityNameDto
 	{
-        public required EntityNameDetails[] EntityNames { get; set; }
-        public required int NovelId { get; set; }
+		public required EntityNameDetails[] EntityNames { get; set; }
+		public required int NovelId { get; set; }
 	}
 
 	public class EntityNameDetails
