@@ -15,12 +15,12 @@ namespace WebApi.Controllers
 	public class NovelController : ControllerBase //TDO use DataProtectionProvider to create protector to encrypt ID
 	{
 		private readonly NovelService _novelService;
-		private readonly IValidator<CreateNovelDto> _createNovelValidator;
+		private readonly IValidator<CreateNovelDto> _NovelValidator;
 
 		public NovelController(NovelService novelService, IValidator<CreateNovelDto> createNovelValidator)
 		{
 			_novelService = novelService;
-			_createNovelValidator = createNovelValidator;
+			_NovelValidator = createNovelValidator;
 		}
 
 		// GET: api/<NovelController>
@@ -50,7 +50,7 @@ namespace WebApi.Controllers
 		[Authorize]
 		public async Task<IActionResult> Create([FromBody] CreateNovelDto novelDto)
 		{
-			ValidationResult validationResult = await _createNovelValidator.ValidateAsync(novelDto);
+			ValidationResult validationResult = await _NovelValidator.ValidateAsync(novelDto);
 
 			if (!validationResult.IsValid)
 			{

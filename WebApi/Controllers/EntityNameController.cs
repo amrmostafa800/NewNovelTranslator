@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WebApi.DTOs;
@@ -10,15 +11,17 @@ namespace WebApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class EntityNameController : ControllerBase //TDO need many edits - use DataProtectionProvider to create protector to encrypt ID
+	public class EntityNameController : ControllerBase //TDO use DataProtectionProvider to create protector to encrypt ID
 	{
-		EntityNameService _entityNameService;
-		NovelService _novelService;
+		private readonly EntityNameService _entityNameService;
+		private readonly NovelService _novelService;
+		private readonly IValidator<EntityNameDto> _EntityNameValidator;
 
-		public EntityNameController(EntityNameService entityNameService, NovelService novelService)
+		public EntityNameController(EntityNameService entityNameService, NovelService novelService, IValidator<EntityNameDto> entityNameValidator)
 		{
 			_entityNameService = entityNameService;
 			_novelService = novelService;
+			_EntityNameValidator = entityNameValidator;
 		}
 
 		// POST api/<EntityNameController>
@@ -26,6 +29,12 @@ namespace WebApi.Controllers
 		[Authorize]
 		public async Task<IActionResult> CreateMany([FromBody] EntityNameDto entityName)
 		{
+			//Validate
+			var validationResult = await _EntityNameValidator.ValidateAsync(entityName);
+			if (!validationResult.IsValid)
+			{
+				return BadRequest(validationResult.Errors);
+			}
 			//Check if user have acsses on this novel or not
 			var novelUserIdOfThisEntity = _novelService.GetById(entityName.NovelId)!.UserId;
 			if (!_IsUserHaveAcsses(novelUserIdOfThisEntity))
@@ -62,7 +71,7 @@ namespace WebApi.Controllers
 					Description = "You Dont Have Permission On This Novel",
 				};
 			}
-
+			//Update EntityName
 			await _entityNameService.UpdateEntityName(id, NewEnglishName, gender);
 			return Ok("Edited");
 		}
@@ -81,7 +90,7 @@ namespace WebApi.Controllers
 					Description = "You Dont Have Permission On This Novel",
 				};
 			}
-
+			//Delete EntityName
 			_entityNameService.DeleteEntityName(id);
 			return NoContent();
 		}

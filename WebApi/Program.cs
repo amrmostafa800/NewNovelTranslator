@@ -31,7 +31,8 @@ namespace WebApi
 
 			builder.Services.AddScoped<NovelService>();
 			builder.Services.AddScoped<EntityNameService>();
-			builder.Services.AddScoped<IValidator<CreateNovelDto>, CreateNovelValidator>();
+			builder.Services.AddScoped<IValidator<CreateNovelDto>, NovelValidator>();
+			builder.Services.AddScoped<IValidator<EntityNameDto>, EntityNameValidator>();
 
 			var app = builder.Build();
 

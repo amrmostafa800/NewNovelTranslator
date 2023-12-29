@@ -75,22 +75,32 @@ namespace NovelTextProcessor
 			request.Content = new StringContent(JObject.FromObject(requestBody).ToString());
 			request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-			var response = await httpClient.SendAsync(request);
-			var responseBody = await response.Content.ReadAsStringAsync();
-
-			if (response.StatusCode == System.Net.HttpStatusCode.OK)
+			try
 			{
-				_retry = 0; // Reset Retry
-				JObject jsonObject = JObject.Parse(responseBody);
+				var response = await httpClient.SendAsync(request);
+				var responseBody = await response.Content.ReadAsStringAsync();
 
-				JToken translationToken = jsonObject.SelectToken("data.translation")!;
-				return translationToken!.ToString();
+				if (response.StatusCode == System.Net.HttpStatusCode.OK)
+				{
+					_retry = 0; // Reset Retry
+					JObject jsonObject = JObject.Parse(responseBody);
+
+					JToken translationToken = jsonObject.SelectToken("data.translation")!;
+					return translationToken!.ToString();
+				}
+				else if (_retry >= _maxRetry)
+				{
+					return null!;
+				}
 			}
-			else if (_retry >= _maxRetry)
+			catch (Exception ex)
 			{
-				return null!;
+				File.AppendAllText("Exception.txt", ex.Message + Environment.NewLine);
 			}
-			_retry++;
+			finally
+			{
+				_retry++;
+			}
 			return await SendRequestAsync(Text);
 		}
 	}
