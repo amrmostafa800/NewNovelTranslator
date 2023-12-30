@@ -1,5 +1,4 @@
 using NovelTextProcessor;
-using NovelTextProcessor.Dtos;
 
 namespace NewNovelTranslator
 {

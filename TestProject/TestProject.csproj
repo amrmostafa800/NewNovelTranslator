@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NamedEntityRecognition\NamedEntityRecognition.csproj" />
     <ProjectReference Include="..\NovelTextProcessor\NovelTextProcessor.csproj" />
   </ItemGroup>
 

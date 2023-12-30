@@ -2,7 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using NovelTextProcessor;
 using WebApi.DTOs;
-using WebApi.Models;
+using WebApi.ObjectsMapper;
 using WebApi.Services;
 
 namespace WebApi.Controllers
@@ -28,29 +28,10 @@ namespace WebApi.Controllers
 				return BadRequest("Novel Id Not Exist");
 			}
 
-			var entityNamesOfThisNovelAsNovelTextProcessor = ConvertFromModelEntityNameArrayToNovelTextProcessorEntityNameArray(entityNamesOfThisNovel.ToArray()).ToArray();
+			var entityNamesOfThisNovelAsNovelTextProcessor = EntityNameMapper.ConvertFromModelEntityNameArrayToNovelTextProcessorEntityNameArray(entityNamesOfThisNovel.ToArray()).ToArray();
 			Processor processor = new Processor(data.Text, entityNamesOfThisNovelAsNovelTextProcessor);
 			await processor.RunAsync();
 			return Ok(processor.GetResult());
-		}
-
-		private IEnumerable<NovelTextProcessor.Dtos.EntityName> ConvertFromModelEntityNameArrayToNovelTextProcessorEntityNameArray(EntityName[] entityNames)
-		{
-			for (int i = 0; i < entityNames.Length; i++)
-			{
-				EntityName? entityName = entityNames[i];
-				yield return ConvertFromModelEntityNameToNovelTextProcessorEntityName(entityName);
-			}
-		}
-
-		private NovelTextProcessor.Dtos.EntityName ConvertFromModelEntityNameToNovelTextProcessorEntityName(EntityName entityName)
-		{
-			return new NovelTextProcessor.Dtos.EntityName()
-			{
-				EnglishName = entityName.EnglishName,
-				ArabicName = entityName.ArabicName!,
-				Gender = entityName.Gender,
-			};
 		}
 	}
 }
