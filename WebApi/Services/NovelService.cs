@@ -52,6 +52,40 @@ namespace WebApi.Services
 			return novelNameInfo.Id;
 		}
 
+		private async Task<bool> _AddNovelUser(int novelId,int userId)
+		{
+			var novelUser = new NovelUser()
+			{
+				NovelId = novelId,
+				UserId = userId,
+			};
+
+			await _context.NovelUsers.AddAsync(novelUser);
+
+			return await _context.SaveChangesAsync() != 0; // check if Added Successfully
+		}
+
+		private async Task<Novel> _AddNovel(int novelNameId)
+		{
+			var novel = new Novel()
+			{
+				NovelNameId = novelNameId,
+			};
+
+			await _context.Novels.AddAsync(novel);
+
+			return novel; // check if Added Successfully
+		}
+
+		private bool _CheckIfNovelAlreadyExistWithThisUser(int novelNameId,int userId)
+		{
+			if (_context.NovelUsers.Any(n => n.Novel!.NovelNameId == novelNameId && n.UserId == userId))
+			{
+				return true;
+			}
+			return false;
+		}
+
 		// i make add novel in 2 table to Allow Create Same Novel By Deffrant Users and Allow more than one User Acsses to Edit This Novel Or Add Entity Names To It without repeat novel name
 		public async Task<int> AddNovel(string novelName, int UserIdWhoCreateNovel)
 		{
@@ -59,31 +93,16 @@ namespace WebApi.Services
 			int novelNameId = await _AddNovelNameIfNotExistElseReturnNovelNameId(novelName);
 
 			//Check If Novel Is Exist (this user already have novel with this name)
-			if (_context.NovelUsers.Any(n => n.Novel!.NovelNameId == novelNameId && n.UserId == UserIdWhoCreateNovel))
+			if (_CheckIfNovelAlreadyExistWithThisUser(novelNameId,UserIdWhoCreateNovel))
 			{
-				return 0;
+				return 0; // mean user already have novel with this name
 			}
 			//Add Novel
-			var novelClone = new Novel()
-			{
-				NovelNameId = novelNameId,
-			};
-
-			await _context.Novels.AddAsync(novelClone);
-
-			await _context.SaveChangesAsync();
+			var novel = await _AddNovel(novelNameId);
 
 			//Add NovelUser
-			var novel = new NovelUser()
-			{
-				NovelId = novelClone.Id,
-				UserId = UserIdWhoCreateNovel,
-			};
-
-			await _context.NovelUsers.AddAsync(novel);
-
-			await _context.SaveChangesAsync();
-			return novelClone.Id;
+			await _AddNovelUser(novel.Id, UserIdWhoCreateNovel);
+			return novel.Id;
 		}
 
 		public async Task<bool> DeleteNovel(int id)
