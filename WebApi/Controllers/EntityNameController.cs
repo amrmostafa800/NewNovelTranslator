@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NovelTextProcessor;
 using System.Security.Claims;
 using WebApi.DTOs;
+using WebApi.ObjectsMapper;
 using WebApi.Responses;
 using WebApi.Services;
 using WebApp.Extensions;
@@ -16,16 +18,18 @@ namespace WebApi.Controllers
 		private readonly EntityNameService _entityNameService;
 		private readonly NovelService _novelService;
 		private readonly IValidator<EntityNameDto> _EntityNameValidator;
+		private readonly Document_NLP document_NLP;
 
 		public EntityNameController(EntityNameService entityNameService, NovelService novelService, IValidator<EntityNameDto> entityNameValidator)
 		{
 			_entityNameService = entityNameService;
 			_novelService = novelService;
 			_EntityNameValidator = entityNameValidator;
+			document_NLP = new Document_NLP();
 		}
 
 		// POST api/<EntityNameController>
-		[HttpPost()]
+		[HttpPost]
 		[Authorize]
 		public async Task<IActionResult> CreateMany([FromBody] EntityNameDto entityName)
 		{
@@ -94,6 +98,14 @@ namespace WebApi.Controllers
 			//Delete EntityName
 			_entityNameService.DeleteEntityName(id);
 			return NoContent();
+		}
+
+		[HttpPost("ExtractEntityNames")]
+		//[Authorize]
+		public async Task<IActionResult> ExtractEntityNamesFromText([FromBody] ExtractEntityNameDto extractEntityName)
+		{
+			await document_NLP.RunAsync(extractEntityName.Text);
+			return Ok(document_NLP.ExtractEntityNames().OrderByDescending(e => e.Length));
 		}
 
 		private bool _IsUserHaveAcsses(int novelUserId)

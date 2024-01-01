@@ -1,4 +1,5 @@
-﻿using WebApi.Models;
+﻿using WebApi.DTOs;
+using WebApi.Models;
 
 namespace WebApi.ObjectsMapper
 {
@@ -8,8 +9,7 @@ namespace WebApi.ObjectsMapper
 		{
 			for (int i = 0; i < entityNames.Length; i++)
 			{
-				EntityName? entityName = entityNames[i];
-				yield return _ConvertFromModelEntityNameToNovelTextProcessorEntityName(entityName);
+				yield return _ConvertFromModelEntityNameToNovelTextProcessorEntityName(entityNames[i]);
 			}
 		}
 
