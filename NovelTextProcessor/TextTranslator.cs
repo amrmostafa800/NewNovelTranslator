@@ -20,7 +20,7 @@ namespace NovelTextProcessor
 
 		public async Task<IEnumerable<string>> SendRequestsAsync(IEnumerable<string> arrayOfText)
 		{
-			var tasks = new List<Task<string>>(); // Use List<Task<string>> for asynchronous tasks
+			var tasks = new List<Task<string>>();
 
 			foreach (var text in arrayOfText)
 			{
@@ -28,10 +28,8 @@ namespace NovelTextProcessor
 				tasks.Add(task);
 			}
 
-			// Wait for all tasks to complete
 			await Task.WhenAll(tasks);
 
-			// Retrieve results from completed tasks
 			var results = tasks.Select(task => task.Result);
 
 			return results;

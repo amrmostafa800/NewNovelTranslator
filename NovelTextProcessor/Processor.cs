@@ -148,6 +148,7 @@ namespace NovelTextProcessor
 			return spans.ToArray();
 		}
 
+		//This Method By Ai (at its time i dont know about LastIndexOf) It was originaly in other project by me and i copy from it to use it here
 		protected string[] _SplitTextToSpans(int maxLength)
 		{
 			List<string> stringList = new List<string>();

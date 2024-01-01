@@ -101,7 +101,7 @@ namespace WebApi.Controllers
 		}
 
 		[HttpPost("ExtractEntityNames")]
-		//[Authorize]
+		[Authorize]
 		public async Task<IActionResult> ExtractEntityNamesFromText([FromBody] ExtractEntityNameDto extractEntityName)
 		{
 			await document_NLP.RunAsync(extractEntityName.Text);
