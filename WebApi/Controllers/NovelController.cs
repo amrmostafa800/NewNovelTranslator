@@ -2,6 +2,7 @@
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using WebApi.DTOs;
 using WebApi.Responses;
@@ -12,7 +13,7 @@ namespace WebApi.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class NovelController : ControllerBase //TDO use DataProtectionProvider to create protector to encrypt ID
+	public class NovelController : ControllerBase //TDO use DataProtectionProvider to create protector to encrypt ID - Try make code more clean
 	{
 		private readonly NovelService _novelService;
 		private readonly IValidator<CreateNovelDto> _NovelValidator;
@@ -75,7 +76,6 @@ namespace WebApi.Controllers
 		[Authorize]
 		public async Task<IActionResult> Delete(int id)
 		{
-			var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
 			var novel = _novelService.GetById(id);
 
 			if (novel == null) // check if novel not exist
@@ -86,7 +86,7 @@ namespace WebApi.Controllers
 				};
 			}
 
-			if (novel.UserId != userId) //check if current User Have Permission To Delete This Novel
+			if (novel.UserId != _GetCurrentUserId()) //check if current User Have Permission To Delete This Novel
 			{
 				return new ErrorResponse()
 				{
@@ -104,5 +104,49 @@ namespace WebApi.Controllers
 			}
 			return Ok("Deleted");
 		}
+
+		[HttpPost("AddNovelUser")]
+		[Authorize]
+		public async Task<IActionResult> AddNovelUser([FromBody] AddNovelUserDto addNovelUser)
+		{
+			if (string.IsNullOrEmpty(addNovelUser.UserName)) 
+			{
+				return new ErrorResponse()
+				{
+					Description = "UserName Cannot Been Null Or Empty"
+				};
+			}
+
+			//Check If CurrentUser Have Permmion To Novel
+			var novel = _novelService.GetById(addNovelUser.NovelId);
+
+			if (novel == null) // check if novel not exist
+			{
+				return new ErrorResponse()
+				{
+					Description = "No Novel With This Id"
+				};
+			}
+
+			if (novel.UserId != _GetCurrentUserId()) //check if current User Have Permission To Delete This Novel
+			{
+				return new ErrorResponse()
+				{
+					Description = "You Cant Delete Novel Without Have Permission On It"
+				};
+			}
+
+			if (await _novelService.AddNovelUser(addNovelUser.NovelId, addNovelUser.UserName)) 
+			{
+				return Ok("Added");
+			}
+
+			return new ErrorResponse()
+			{
+				Description = "You Already Have Permission On This Novel"
+			};
+		}
+
+		private int _GetCurrentUserId() => User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
 	}
 }

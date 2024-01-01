@@ -105,6 +105,18 @@ namespace WebApi.Services
 			return novel.Id;
 		}
 
+		public async Task<bool> AddNovelUser(int novelId,string username)
+		{
+			var userId = await _context.Users.Where(u => u.UserName == username).Select(u => u.Id).FirstOrDefaultAsync();
+
+			if (await IsUserOwnThisNovel(novelId,userId))
+			{
+				return false; // user already in this novel
+			}
+
+			return await _AddNovelUser(novelId, userId);
+		}
+
 		public async Task<bool> DeleteNovel(int id)
 		{
 			//Try Get Novel
@@ -121,7 +133,7 @@ namespace WebApi.Services
 
 		public async Task<bool> IsUserOwnThisNovel(int novelId, int UserId)
 		{
-			var novel = await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelId == novelId && n.UserId == UserId);
+			NovelUser? novel = await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelId == novelId && n.UserId == UserId);
 			return novel != null;
 		}
 	}
