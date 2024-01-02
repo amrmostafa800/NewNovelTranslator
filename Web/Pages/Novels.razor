@@ -1,11 +1,13 @@
 ﻿@page "/Novels"
+@using Web.Dialogs
 @using Web.Models
 @using Web.Services
 @inject NovelService _novelService;
+@inject IDialogService DialogService
 <PageTitle>Novels</PageTitle>
 
 
-
+<MudButton OnClick="OpenDialog">Add Novel</MudButton>
 <MudTable Items="@novels" Hover="true" Breakpoint="Breakpoint.Sm">
     <HeaderContent>
         <MudTh>ID</MudTh>
@@ -25,5 +27,13 @@
     protected override async Task OnInitializedAsync()
     {
         novels = await _novelService.GetAllNovels();
+    }
+    private void OpenDialog()
+    {
+        var options = new DialogOptions 
+        {
+            CloseOnEscapeKey = true
+        };
+        DialogService.Show<AddNovelDialog>("Add Novel", options);
     }
 }

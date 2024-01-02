@@ -49,7 +49,7 @@ namespace WebApi
 
 			app.UseHttpsRedirection();
 
-			app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+			app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()); //TDO make it allow connect from origin of FrontEnd only
 
 			app.UseAuthorization();
 

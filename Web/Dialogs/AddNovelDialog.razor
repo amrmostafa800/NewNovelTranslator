@@ -1,0 +1,32 @@
+﻿@using Web.Services
+@inject NovelService _novelService;
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudTextField T="string" Label="NovelName" Required="true" RequiredError="Novel Name is required!" @ref="NovelName" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    bool success;
+    string[] errors = { };
+    MudForm? form;
+    MudTextField<string>? NovelName;
+
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    async void Submit()
+    {
+        if (errors.Length == 0 && NovelName!.Text != null)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+        }
+        await _novelService.AddNovel(NovelName!.Text!);
+    }
+    void Cancel() => MudDialog.Cancel();
+}

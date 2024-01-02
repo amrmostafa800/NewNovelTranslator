@@ -15,7 +15,7 @@ builder.Services.AddScoped(sp =>
     new HttpClient
     {
         //BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) //TDO edit to add url here or make config file
-        BaseAddress = new Uri("https://localhost:7064")
+        BaseAddress = new Uri("http://localhost:5000")
     });
 
 builder.Services.AddScoped<NovelService>();

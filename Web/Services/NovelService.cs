@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Web.Models;
-using static MudBlazor.Icons;
 
 namespace Web.Services
 {
@@ -32,6 +32,23 @@ namespace Web.Services
                 Console.WriteLine($"Error fetching novels: {ex.Message}");
                 return Array.Empty<Novel>();
             }
+        }
+
+        public async Task<bool> AddNovel(string novelName)
+        {
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5000/api/Novel");
+
+            request.Headers.Add("accept", "*/*");
+
+            request.Content = new StringContent("{\n  \"novelName\": \"\"\n}");
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            HttpResponseMessage response = await _client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
