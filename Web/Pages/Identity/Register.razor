@@ -1,13 +1,16 @@
 ﻿@page "/Identity/Register"
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
+@using Web.Services
+@inject UserService _userService;
+@inject IDialogService _dialogService;
 
 <MudGrid>
     <MudItem xs="32" sm="12">
         <MudPaper Class="pa-4">
             <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
                 <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!"
-                              Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" />
+                              Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" @ref="email" />
                 <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="password"
                               InputType="InputType.Password"
                               Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
@@ -17,7 +20,7 @@
                               Validation="@(new Func<string, string>(PasswordMatch))" />
                 <div class="d-flex align-center justify-space-between">
                     <MudCheckBox T="bool" Required="true" RequiredError="You must agree" Label="I agree!" />
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Register</MudButton>
+                    <MudButton OnClick="Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Register</MudButton>
                 </div>
             </MudForm>
         </MudPaper>
@@ -26,6 +29,7 @@
 @code {
     bool success;
     string[] errors = { };
+    MudTextField<string>? email;
     MudTextField<string>? password;
     MudForm? form;
 
@@ -53,11 +57,16 @@
         return null!;
     }
 
-    async void Submit()
+    async Task Submit()
     {
         if (errors.Length == 0)
         {
-            
+            if (await _userService.Register(email!.Text, password!.Text))
+            {
+                success = true;
+                await _dialogService.ShowMessageBox("Successfully", "You Have Register Successfully");
+                //StateHasChanged();
+            }
         }
         
     }

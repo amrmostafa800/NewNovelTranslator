@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Web.Dto;
 using Web.Models;
 
 namespace Web.Services
@@ -36,11 +37,16 @@ namespace Web.Services
 
         public async Task<bool> AddNovel(string novelName)
         {
+            AddNovelDto addNovel = new() 
+            {
+                novelName = novelName
+            };
+
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5000/api/Novel");
 
             request.Headers.Add("accept", "*/*");
 
-            request.Content = new StringContent("{\n  \"novelName\": \"\"\n}");
+            request.Content = new StringContent(JObject.FromObject(addNovel).ToString());
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             HttpResponseMessage response = await _client.SendAsync(request);

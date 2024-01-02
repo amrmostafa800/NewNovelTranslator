@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using MudBlazor;
 using MudBlazor.Services;
 using Web;
 using Web.Services;
@@ -10,6 +11,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddMudServices();
+builder.Services.AddMudBlazorDialog();
 
 builder.Services.AddScoped(sp =>
     new HttpClient
@@ -19,5 +21,6 @@ builder.Services.AddScoped(sp =>
     });
 
 builder.Services.AddScoped<NovelService>();
+builder.Services.AddScoped<UserService>();
 
 await builder.Build().RunAsync();

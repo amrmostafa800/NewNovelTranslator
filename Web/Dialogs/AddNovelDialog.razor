@@ -1,5 +1,6 @@
 ﻿@using Web.Services
 @inject NovelService _novelService;
+@inject IDialogService _dialogService;
 <MudDialog>
     <DialogContent>
         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
@@ -24,8 +25,12 @@
     {
         if (errors.Length == 0 && NovelName!.Text != null)
         {
-            await _novelService.AddNovel(NovelName!.Text!);
-            MudDialog.Close(DialogResult.Ok(true));
+            if (await _novelService.AddNovel(NovelName!.Text!))
+            {
+                MudDialog.Close(DialogResult.Ok(true));
+            }
+            await _dialogService.ShowMessageBox("Error", "Api Server Down Or Uknown Error Please Report");
+
         }
     }
     void Cancel() => MudDialog.Cancel();
