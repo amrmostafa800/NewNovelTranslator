@@ -24,9 +24,12 @@
     {
         if (errors.Length == 0 && NovelName!.Text != null)
         {
+            await _novelService.AddNovel(NovelName!.Text!);
+        }
+        else
+        {
             MudDialog.Close(DialogResult.Ok(true));
         }
-        await _novelService.AddNovel(NovelName!.Text!);
     }
     void Cancel() => MudDialog.Cancel();
 }
