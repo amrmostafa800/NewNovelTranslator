@@ -23,6 +23,8 @@ namespace WebApi
 			builder.Services.AddIdentityApiEndpoints<CustomIdentityUser>()
 			.AddEntityFrameworkStores<ApplicationDbContext>();
 
+			builder.Services.AddCors();
+
 			builder.Services.AddAuthorization();
 			builder.Services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -46,6 +48,8 @@ namespace WebApi
 			app.MapIdentityApi<CustomIdentityUser>();
 
 			app.UseHttpsRedirection();
+
+			app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
 			app.UseAuthorization();
 
