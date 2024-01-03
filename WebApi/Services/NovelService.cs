@@ -74,6 +74,8 @@ namespace WebApi.Services
 
 			await _context.Novels.AddAsync(novel);
 
+			await _context.SaveChangesAsync();
+
 			return novel; // check if Added Successfully
 		}
 

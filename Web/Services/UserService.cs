@@ -15,7 +15,7 @@ namespace Web.Services
 
         public async Task<bool> Register(string email,string password)
         {
-            RegisterDto register = new()
+            AccountDto register = new()
             {
                 email= email,
                 password= password
@@ -26,6 +26,29 @@ namespace Web.Services
             request.Headers.Add("accept", "*/*");
 
             request.Content = new StringContent(JObject.FromObject(register).ToString());
+            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+            HttpResponseMessage response = await _client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> Login(string email, string password)
+        {
+            AccountDto login = new()
+            {
+                email = email,
+                password = password
+            };
+
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5000/login");
+
+            request.Headers.Add("accept", "*/*");
+
+            request.Content = new StringContent(JObject.FromObject(login).ToString());
             request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
             HttpResponseMessage response = await _client.SendAsync(request);
