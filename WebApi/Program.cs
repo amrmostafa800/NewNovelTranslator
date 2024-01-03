@@ -25,7 +25,14 @@ namespace WebApi
 
 			builder.Services.AddCors();
 
-			builder.Services.AddAuthorization();
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.HttpOnly = true;
+            });
+
+            builder.Services.AddAuthorization();
 			builder.Services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
@@ -49,9 +56,13 @@ namespace WebApi
 
 			app.UseHttpsRedirection();
 
-			app.UseCors(c => c.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin()); //TDO make it allow connect from origin of FrontEnd only
-
-			app.UseAuthorization();
+            app.UseCors(x => x
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .SetIsOriginAllowed(origin => true)
+                .AllowCredentials()
+            );
+            app.UseAuthorization();
 
 
 			app.MapControllers();

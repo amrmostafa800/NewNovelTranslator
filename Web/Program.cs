@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using MudBlazor;
 using MudBlazor.Services;
 using Web;
 using Web.Services;
@@ -13,12 +12,18 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddMudServices();
 builder.Services.AddMudBlazorDialog();
 
-builder.Services.AddScoped(sp =>
-    new HttpClient
-    {
-        //BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) //TDO edit to add url here or make config file
-        BaseAddress = new Uri("http://localhost:5000")
-    });
+//builder.Services.AddScoped(sp =>
+//    new HttpClient
+//    {
+//        //BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) //TDO edit to add url here or make config file
+//        BaseAddress = new Uri("http://localhost:5000"),
+//    });
+
+builder.Services
+    .AddTransient<CookieHandler>()
+    .AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("API"))
+    .AddHttpClient("API", client => client.BaseAddress = new Uri("http://localhost:5000"))
+    .AddHttpMessageHandler<CookieHandler>();
 
 builder.Services.AddScoped<NovelService>();
 builder.Services.AddScoped<UserService>();

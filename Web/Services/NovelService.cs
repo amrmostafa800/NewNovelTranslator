@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Web.Dto;
@@ -16,7 +15,7 @@ namespace Web.Services
             _client = client;
         }
 
-        public async Task<Novel[]> GetAllNovels() 
+        public async Task<Novel[]> GetAllNovels()
         {
             try
             {
@@ -37,7 +36,7 @@ namespace Web.Services
 
         public async Task<bool> AddNovel(string novelName)
         {
-            AddNovelDto addNovel = new() 
+            AddNovelDto addNovel = new()
             {
                 novelName = novelName
             };

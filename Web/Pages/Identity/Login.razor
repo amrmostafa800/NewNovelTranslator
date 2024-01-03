@@ -60,8 +60,13 @@
             if (await _userService.Login(email!.Text, password!.Text))
             {
                 success = true;
-                await _dialogService.ShowMessageBox("Successfully", "You Have Register Successfully");
+                await _dialogService.ShowMessageBox("Successfully", "You Login Successfully");
                 //StateHasChanged();
+                //var cookies = HttpContext.Request.Cookies[".AspNetCore.Cookies"];
+            }
+            else
+            {
+                await _dialogService.ShowMessageBox("Error", "Username or Password Is Invalid");
             }
         }
 
