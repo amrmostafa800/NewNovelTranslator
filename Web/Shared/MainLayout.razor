@@ -8,6 +8,13 @@
 <MudLayout>
     <MudAppBar Elevation="0">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <div class="flex-grow-1"></div>
+        <MudAvatar Rounded="true" Color="Color.Secondary">
+            <MudIcon Icon="@Icons.Material.Filled.FormatListNumbered" />
+            <MudMenu Class="object-fill">
+                <MudMenuItem>LogOut</MudMenuItem>
+            </MudMenu>
+        </MudAvatar>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
         <MudDrawerHeader>

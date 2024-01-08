@@ -28,6 +28,7 @@ namespace WebApi
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.SameSite = SameSiteMode.None;
+				//options.Cookie.Domain = ""; // need to set later maybe
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.HttpOnly = true;
             });

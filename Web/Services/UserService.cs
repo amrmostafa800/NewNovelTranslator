@@ -36,6 +36,7 @@ namespace Web.Services
             };
 
             HttpResponseMessage response = await _client.PostAsJsonAsync("/login?useCookies=true", login);
+            var coockies = response.Headers.Where(h => h.Key == "Cookie");
             if (response.IsSuccessStatusCode)
             {
                 return true;
