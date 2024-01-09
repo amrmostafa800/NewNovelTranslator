@@ -1,4 +1,7 @@
-﻿@inherits LayoutComponentBase
+﻿@using Web.Services
+@inherits LayoutComponentBase
+@inject UserService _userService
+@inject NavigationManager _manager;
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" />
 <MudSwitch @bind-Checked="@_isDarkMode" Color="Color.Primary" Class="ma-4" T="bool" Label="Dark Mode" />
@@ -12,7 +15,15 @@
         <MudAvatar Rounded="true" Color="Color.Secondary">
             <MudIcon Icon="@Icons.Material.Filled.FormatListNumbered" />
             <MudMenu Class="object-fill">
-                <MudMenuItem>LogOut</MudMenuItem>
+                @if (isAuth)
+                {
+                    <MudMenuItem OnClick="Logout">LogOut</MudMenuItem>
+                }
+                else
+                {
+                    <MudMenuItem OnClick="GoToLogin">Login</MudMenuItem>
+                    <MudMenuItem OnClick="GoToRegister">Register</MudMenuItem>
+                }
             </MudMenu>
         </MudAvatar>
     </MudAppBar>
@@ -33,8 +44,46 @@
     bool _drawerOpen = true;
     private bool _isDarkMode = true;
 
+    bool isAuth = false;
+
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        @if (await _userService.IsAuth())
+        {
+            isAuth = true;
+        }
+
+        _userService.OnLogin += OnLogin!;
+        _userService.OnLogout += OnLogout!;
+    }
+
+    private void GoToLogin()
+    {
+        _manager.NavigateTo("identity/Login");
+    }
+
+    private void GoToRegister()
+    {
+        _manager.NavigateTo("identity/Register");
+    }
+
+    private async Task Logout()
+    {
+        await _userService.LogOut();
+    }
+
+    private void OnLogin(object sender,EventArgs e)
+    {
+        isAuth = true;
+    }
+
+    private void OnLogout(object sender, EventArgs e)
+    {
+        isAuth = false;
     }
 }

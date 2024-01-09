@@ -28,14 +28,20 @@
     {
         if (errors.Length == 0 && NovelName!.Text != null)
         {
-            if (await _novelService.AddNovel(NovelName!.Text!))
+            switch (await _novelService.AddNovel(NovelName!.Text!))
             {
-                MudDialog.Close(DialogResult.Ok(true));
-                _manager.Refresh();
-            }
-            else
-            {
-                await _dialogService.ShowMessageBox("Error", "Api Server Down Or Uknown Error Please Report");
+                case Enums.EaddNovelResult.Success:
+                    MudDialog.Close(DialogResult.Ok(true));
+                    _manager.Refresh();
+                    break;
+                case Enums.EaddNovelResult.AuthRequired:
+                    await _dialogService.ShowMessageBox("Error", "Please Login First");
+                    break;
+                case Enums.EaddNovelResult.ServerError:
+                    await _dialogService.ShowMessageBox("Error", "Api Server Down Or Uknown Error Please Report");
+                    break;
+                default:
+                    return;
             }
         }
     }

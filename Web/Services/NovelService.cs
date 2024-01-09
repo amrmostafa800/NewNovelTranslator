@@ -2,6 +2,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Web.Dto;
+using Web.Enums;
 using Web.Models;
 
 namespace Web.Services
@@ -34,7 +35,7 @@ namespace Web.Services
             }
         }
 
-        public async Task<bool> AddNovel(string novelName)
+        public async Task<EaddNovelResult> AddNovel(string novelName)
         {
             AddNovelDto addNovel = new()
             {
@@ -51,9 +52,13 @@ namespace Web.Services
             HttpResponseMessage response = await _client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                return true;
+                return EaddNovelResult.Success;
             }
-            return false;
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return EaddNovelResult.AuthRequired;
+            }
+            return EaddNovelResult.ServerError;
         }
     }
 }
