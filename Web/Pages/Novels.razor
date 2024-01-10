@@ -3,25 +3,29 @@
 @using Web.Models
 @using Web.Services
 @inject NovelService _novelService;
-@inject IDialogService DialogService
+@inject IDialogService _dialogService
+@inject NavigationManager _navigationManager
 <PageTitle>Novels</PageTitle>
 
 
 <MudButton OnClick="OpenDialog">Add Novel</MudButton>
-<MudTable Items="@novels" Hover="true" Breakpoint="Breakpoint.Sm">
+<MudTable T="Novel" RowClass="cursor-pointer" Items="@novels" Hover="true" Breakpoint="Breakpoint.Sm" @ref="novelsTable" OnRowClick="RowClickEvent">
     <HeaderContent>
-        <MudTh>ID</MudTh>
         <MudTh>Name</MudTh>
+        <MudTh>Owner</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="ID">@context.Id</MudTd>
             <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Username">@context.UserName</MudTd>
+            <MudTd Class="invisible" DataLabel="ID">@context.Id</MudTd>
             <MudTd Class="invisible" DataLabel="UserId">@context.UserId</MudTd>
-            <MudTd Class="invisible" DataLabel="Name">@context.UserName</MudTd>
         </RowTemplate>
     </MudTable>
 
-    @code {
+    @code{
+
+    private MudTable<Novel>? novelsTable;
+
     Novel[] novels = Array.Empty<Novel>();
 
     protected override async Task OnInitializedAsync()
@@ -34,6 +38,12 @@
         {
             CloseOnEscapeKey = true
         };
-        DialogService.Show<AddNovelDialog>("Add Novel", options);
+        _dialogService.Show<AddNovelDialog>("Add Novel", options);
+    }
+
+    private async void RowClickEvent(TableRowClickEventArgs<Novel> tableRowClickEventArgs)
+    {
+        //await _dialogService.ShowMessageBox("test", tableRowClickEventArgs.Item.Name);
+        //TDO Use _navigationManager to go to novel page (still not create novel page)
     }
 }

@@ -4,7 +4,7 @@
 @using Web.Services
 @inject UserService _userService;
 @inject IDialogService _dialogService;
-@inject NavigationManager _manager;
+@inject NavigationManager _navigationManager;
 
 
 <MudGrid>
@@ -64,7 +64,7 @@
                 success = true;
                 await _dialogService.ShowMessageBox("Successfully", "You Login Successfully");
                 //StateHasChanged();
-                _manager.NavigateTo(""); // empty = home page
+                _navigationManager.NavigateTo(""); // empty = home page
             }
             else
             {

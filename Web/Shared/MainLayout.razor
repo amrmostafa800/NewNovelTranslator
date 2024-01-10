@@ -1,7 +1,7 @@
 ﻿@using Web.Services
 @inherits LayoutComponentBase
 @inject UserService _userService
-@inject NavigationManager _manager;
+@inject NavigationManager _navigationManager;
 
 <MudThemeProvider @bind-IsDarkMode="@_isDarkMode" />
 <MudSwitch @bind-Checked="@_isDarkMode" Color="Color.Primary" Class="ma-4" T="bool" Label="Dark Mode" />
@@ -53,23 +53,28 @@
 
     protected override async Task OnInitializedAsync()
     {
-        @if (await _userService.IsAuth())
+        if (await _userService.IsAuth())
         {
             isAuth = true;
         }
 
+        SubscribeToEvents();
+    }
+
+    private void SubscribeToEvents()
+    {
         _userService.OnLogin += OnLogin!;
         _userService.OnLogout += OnLogout!;
     }
 
     private void GoToLogin()
     {
-        _manager.NavigateTo("identity/Login");
+        _navigationManager.NavigateTo("identity/Login");
     }
 
     private void GoToRegister()
     {
-        _manager.NavigateTo("identity/Register");
+        _navigationManager.NavigateTo("identity/Register");
     }
 
     private async Task Logout()

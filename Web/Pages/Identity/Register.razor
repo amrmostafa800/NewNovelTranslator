@@ -4,7 +4,7 @@
 @using Web.Services
 @inject UserService _userService;
 @inject IDialogService _dialogService;
-@inject NavigationManager _manager;
+@inject NavigationManager _navigationManager;
 
 <MudGrid>
     <MudItem xs="32" sm="12">
@@ -67,7 +67,7 @@
                 success = true;
                 await _dialogService.ShowMessageBox("Successfully", "You Have Register Successfully");
                 //StateHasChanged();
-                _manager.NavigateTo("identity/Login");
+                _navigationManager.NavigateTo("identity/Login");
             }
         }
         
