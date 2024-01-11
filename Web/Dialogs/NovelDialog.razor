@@ -1,14 +1,14 @@
 ﻿<MudButton OnClick="Back">Back</MudButton>
 <MudDialog>
     <DialogContent>
-        Character Names @novelId
+        Character Names @* @NovelId //TDO *@
     </DialogContent>
 </MudDialog>
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
-    [Parameter] public string novelId { get; set; }
 
+    [Parameter] public int NovelId { get; set; }
 
     void Back() => MudDialog.Cancel();
 }

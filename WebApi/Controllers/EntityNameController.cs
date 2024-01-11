@@ -28,6 +28,20 @@ namespace WebApi.Controllers
 			document_NLP = new Document_NLP();
 		}
 
+		[HttpGet("{id}")]
+		public IActionResult GetEntityNameById(int id) 
+		{
+			var entityNames = _entityNameService.GetEntityNamesByNovelId(id);
+
+            return Ok(entityNames.Select(e => new 
+			{
+				e.Id,
+				e.EnglishName,
+				e.ArabicName,
+				e.Gender
+			}));
+		}
+
 		// POST api/<EntityNameController>
 		[HttpPost]
 		[Authorize]
@@ -53,7 +67,7 @@ namespace WebApi.Controllers
 			var entityNamesAddResult = await _entityNameService.AddManyEntityNames(entityName);
 			if (entityNamesAddResult) // If Add Not Failed
 			{
-				return Ok($"Created Id:{entityNamesAddResult}");
+				return NoContent();
 			}
 			return new ErrorResponse()
 			{

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace WebApi.Models
 {
@@ -17,6 +18,6 @@ namespace WebApi.Models
 
 		public int NovelId { get; set; }
 
-		public Novel? Novel { get; set; }
+        public Novel? Novel { get; set; }
 	}
 }

@@ -51,8 +51,8 @@
             FullScreen = true,
         };
 
-        var dialogParam = new DialogParameters();
-        dialogParam.Add("novelId", novelRowEventArgs.Item.Id);
+        var dialogParam = new DialogParameters<NovelDialog>();
+        dialogParam.Add(n => n.NovelId, novelRowEventArgs.Item.Id);
 
         _dialogService.Show<NovelDialog>(novelRowEventArgs.Item.Name, dialogParam, options);
     }
