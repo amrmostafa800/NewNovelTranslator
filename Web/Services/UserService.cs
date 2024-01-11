@@ -55,9 +55,13 @@ namespace Web.Services
             HttpResponseMessage response = await _client.GetAsync("api/Validation/IsAuth");
             if (response.IsSuccessStatusCode) 
             {
-                return true;
+                if (await response.Content.ReadAsStringAsync() == "true")
+                {
+                    return true;
+                }
+                return false;
             }
-            return false;
+            throw new Exception("Server Error");
         }
 
         public async Task<bool> LogOut()

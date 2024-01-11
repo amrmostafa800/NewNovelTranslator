@@ -9,14 +9,19 @@ namespace WebApi.Controllers
     public class ValidationController : ControllerBase
     {
         [HttpGet("IsAuth")]
-        [Authorize]
         public IActionResult IsAuth()
         {
             //if (string.IsNullOrEmpty(Request.Headers.Cookie)) 
             //{
             //    return BadRequest();
             //}
-            return NoContent();
+
+            if (!User.Identity!.IsAuthenticated) // if user not Authenticated
+            {
+                return Ok("false");
+            }
+
+            return Ok("true");
         }
 
         [HttpGet("Logout")]

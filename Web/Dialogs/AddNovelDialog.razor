@@ -2,7 +2,7 @@
 @inject NovelService _novelService;
 @inject IDialogService _dialogService;
 @inject IJSRuntime JsRuntime;
-@inject NavigationManager _manager;
+@inject NavigationManager _navigationManager;
 
 <MudDialog>
     <DialogContent>
@@ -32,7 +32,7 @@
             {
                 case Enums.EaddNovelResult.Success:
                     MudDialog.Close(DialogResult.Ok(true));
-                    _manager.Refresh();
+                    _navigationManager.Refresh();
                     break;
                 case Enums.EaddNovelResult.AuthRequired:
                     await _dialogService.ShowMessageBox("Error", "Please Login First");

@@ -8,8 +8,8 @@
 <PageTitle>Novels</PageTitle>
 
 
-<MudButton OnClick="OpenDialog">Add Novel</MudButton>
-<MudTable T="Novel" RowClass="cursor-pointer" Items="@novels" Hover="true" Breakpoint="Breakpoint.Sm" @ref="novelsTable" OnRowClick="RowClickEvent">
+<MudButton OnClick="OpenAddNovelDialog">Add Novel</MudButton>
+<MudTable T="Novel" RowClass="cursor-pointer" Items="@novels" Hover="true" Breakpoint="Breakpoint.Sm" @ref="novelsTable" OnRowClick="OnNovelRowClick">
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Owner</MudTh>
@@ -32,7 +32,7 @@
     {
         novels = await _novelService.GetAllNovels();
     }
-    private void OpenDialog()
+    private void OpenAddNovelDialog()
     {
         var options = new DialogOptions 
         {
@@ -41,9 +41,19 @@
         _dialogService.Show<AddNovelDialog>("Add Novel", options);
     }
 
-    private async void RowClickEvent(TableRowClickEventArgs<Novel> tableRowClickEventArgs)
+    private void OnNovelRowClick(TableRowClickEventArgs<Novel> novelRowEventArgs)
     {
         //await _dialogService.ShowMessageBox("test", tableRowClickEventArgs.Item.Name);
         //TDO Use _navigationManager to go to novel page (still not create novel page)
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true,
+            FullScreen = true,
+        };
+
+        var dialogParam = new DialogParameters();
+        dialogParam.Add("novelId", novelRowEventArgs.Item.Id);
+
+        _dialogService.Show<NovelDialog>(novelRowEventArgs.Item.Name, dialogParam, options);
     }
 }
