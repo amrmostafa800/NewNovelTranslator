@@ -1,0 +1,36 @@
+﻿@using Web.Models
+@using Web.Services
+@inject EntityNamesService _entityNamesService
+<MudButton OnClick="Back">Back</MudButton>
+<MudDialog>
+    <DialogContent>
+        <MudTable Items="@EntityNames" Hover="true" Breakpoint="Breakpoint.Sm">
+            <HeaderContent>
+                <MudTh>EnglishName</MudTh>
+                <MudTh>ArabicName</MudTh>
+                <MudTh>Gender</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                    <MudTd DataLabel="EnglishName">@context.englishName</MudTd>
+                    <MudTd DataLabel="ArabicName">@context.arabicName</MudTd>
+                    <MudTd DataLabel="Gender">@context.gender</MudTd>
+                    <MudTd Class="invisible" DataLabel="Id">@context.id</MudTd>
+                </RowTemplate>
+            </MudTable>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter] public int NovelId { get; set; }
+
+    void Back() => MudDialog.Cancel();
+
+    EntityName[]? EntityNames;
+
+    protected override async Task OnInitializedAsync()
+    {
+        EntityNames = await _entityNamesService.GetAllEntityNamesByNovelId(NovelId);
+    }
+}

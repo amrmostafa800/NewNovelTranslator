@@ -1,7 +1,9 @@
-﻿<MudButton OnClick="Back">Back</MudButton>
+﻿@inject IDialogService _dialogService
+<MudButton OnClick="Back">Back</MudButton>
 <MudDialog>
     <DialogContent>
-        Character Names @* @NovelId //TDO *@
+        <MudButton OnClick="ShowCharacterNamesDialog" Variant="Variant.Filled">Show Character Names</MudButton>
+        <MudButton Variant="Variant.Filled">Translator</MudButton>
     </DialogContent>
 </MudDialog>
 
@@ -11,4 +13,17 @@
     [Parameter] public int NovelId { get; set; }
 
     void Back() => MudDialog.Cancel();
+
+    void ShowCharacterNamesDialog()
+    {
+        var parameters = new DialogParameters<ShowCharacterNamesDialog>();
+        parameters.Add(p => p.NovelId, NovelId);
+
+        var option = new DialogOptions()
+        {
+            FullScreen = true,
+        };
+
+        _dialogService.Show<ShowCharacterNamesDialog>("Chracter Names", parameters, option);
+    }
 }

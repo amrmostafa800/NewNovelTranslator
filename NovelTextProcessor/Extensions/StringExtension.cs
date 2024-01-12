@@ -9,8 +9,7 @@
 			{
 				return value;
 			}
-			value = value.Substring(0, position) + to + value.Substring(position + from.Length);
-			return value;
+			return value.Substring(0, position) + to + value.Substring(position + from.Length);
 		}
 	}
 }

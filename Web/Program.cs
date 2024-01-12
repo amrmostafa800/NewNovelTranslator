@@ -27,5 +27,6 @@ builder.Services
 
 builder.Services.AddScoped<NovelService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<EntityNamesService>();
 
 await builder.Build().RunAsync();
