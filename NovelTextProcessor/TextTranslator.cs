@@ -24,7 +24,8 @@ namespace NovelTextProcessor
 
 			foreach (var text in arrayOfText)
 			{
-				var task = Task.Run(() => SendRequestAsync(text));
+				//var task = Task.Run(() => SendRequestAsync(text)); // Multi Thereds
+				var task = SendRequestAsync(text); // async programing without create new Thered
 				tasks.Add(task);
 			}
 

@@ -30,6 +30,7 @@
         {
             text = new TextBox();
             start = new Button();
+            textResult = new TextBox();
             SuspendLayout();
             // 
             // text
@@ -50,11 +51,20 @@
             start.UseVisualStyleBackColor = true;
             start.Click += start_Click;
             // 
+            // textResult
+            // 
+            textResult.Location = new Point(7, 237);
+            textResult.Multiline = true;
+            textResult.Name = "textResult";
+            textResult.Size = new Size(532, 175);
+            textResult.TabIndex = 2;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(551, 424);
+            Controls.Add(textResult);
             Controls.Add(start);
             Controls.Add(text);
             Name = "Form1";
@@ -67,5 +77,6 @@
 
         private TextBox text;
         private Button start;
+        private TextBox textResult;
     }
 }
