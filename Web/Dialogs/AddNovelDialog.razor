@@ -1,4 +1,5 @@
 ﻿@using Web.Services
+@using Web.Enums
 @inject NovelService _novelService;
 @inject IDialogService _dialogService;
 @inject IJSRuntime JsRuntime;
@@ -7,7 +8,7 @@
 <MudDialog>
     <DialogContent>
         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
-            <MudTextField T="string" Label="NovelName" Required="true" RequiredError="Novel Name is required!" @ref="NovelName" />
+            <MudTextField T="string" Label="NovelName" Required="true" RequiredError="Novel Name is required!" @ref="NovelName"/>
         </MudForm>
     </DialogContent>
     <DialogActions>
@@ -30,14 +31,14 @@
         {
             switch (await _novelService.AddNovel(NovelName!.Text!))
             {
-                case Enums.EaddNovelResult.Success:
+                case EaddNovelResult.Success:
                     MudDialog.Close(DialogResult.Ok(true));
                     _navigationManager.Refresh();
                     break;
-                case Enums.EaddNovelResult.AuthRequired:
+                case EaddNovelResult.AuthRequired:
                     await _dialogService.ShowMessageBox("Error", "Please Login First");
                     break;
-                case Enums.EaddNovelResult.ServerError:
+                case EaddNovelResult.ServerError:
                     await _dialogService.ShowMessageBox("Error", "Api Server Down Or Uknown Error Please Report");
                     break;
                 default:
@@ -45,5 +46,10 @@
             }
         }
     }
-    void Cancel() => MudDialog.Cancel();
+
+    void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
 }

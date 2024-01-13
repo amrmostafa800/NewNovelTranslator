@@ -1,7 +1,7 @@
 ﻿@page "/Novels"
-@using Web.Dialogs
 @using Web.Models
 @using Web.Services
+@using Web.Dialogs
 @inject NovelService _novelService;
 @inject IDialogService _dialogService
 @inject NavigationManager _navigationManager
@@ -15,14 +15,14 @@
         <MudTh>Owner</MudTh>
     </HeaderContent>
     <RowTemplate>
-            <MudTd DataLabel="Name">@context.Name</MudTd>
-            <MudTd DataLabel="Username">@context.UserName</MudTd>
-            <MudTd Class="invisible" DataLabel="ID">@context.Id</MudTd>
-            <MudTd Class="invisible" DataLabel="UserId">@context.UserId</MudTd>
-        </RowTemplate>
-    </MudTable>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Username">@context.UserName</MudTd>
+        <MudTd Class="invisible" DataLabel="ID">@context.Id</MudTd>
+        <MudTd Class="invisible" DataLabel="UserId">@context.UserId</MudTd>
+    </RowTemplate>
+</MudTable>
 
-    @code{
+@code{
 
     private MudTable<Novel>? novelsTable;
 
@@ -32,9 +32,10 @@
     {
         novels = await _novelService.GetAllNovels();
     }
+
     private void OpenAddNovelDialog()
     {
-        var options = new DialogOptions 
+        var options = new DialogOptions
         {
             CloseOnEscapeKey = true
         };
@@ -48,7 +49,7 @@
         var options = new DialogOptions
         {
             CloseOnEscapeKey = true,
-            FullScreen = true,
+            FullScreen = true
         };
 
         var dialogParam = new DialogParameters<NovelDialog>();
@@ -56,4 +57,5 @@
 
         _dialogService.Show<NovelDialog>(novelRowEventArgs.Item.Name, dialogParam, options);
     }
+
 }

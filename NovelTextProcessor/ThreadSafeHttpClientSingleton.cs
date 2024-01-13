@@ -1,30 +1,29 @@
-﻿namespace NovelTextProcessor
+﻿namespace NovelTextProcessor;
+
+public sealed class ThreadSafeHttpClientSingleton : IDisposable //This Class By ChatGpt
 {
-	public sealed class ThreadSafeHttpClientSingleton : IDisposable //This Class By ChatGpt
-	{
-		private static readonly Lazy<ThreadSafeHttpClientSingleton> lazyInstance =
-			new Lazy<ThreadSafeHttpClientSingleton>(() => new ThreadSafeHttpClientSingleton());
+    private static readonly Lazy<ThreadSafeHttpClientSingleton> lazyInstance =
+        new(() => new ThreadSafeHttpClientSingleton());
 
-		public static ThreadSafeHttpClientSingleton Instance => lazyInstance.Value;
+    private readonly HttpClient httpClient;
 
-		private readonly HttpClient httpClient;
+    private ThreadSafeHttpClientSingleton()
+    {
+        // Configure HttpClient with necessary settings (e.g., timeout, headers)
+        httpClient = new HttpClient();
+    }
 
-		private ThreadSafeHttpClientSingleton()
-		{
-			// Configure HttpClient with necessary settings (e.g., timeout, headers)
-			this.httpClient = new HttpClient();
-		}
+    public static ThreadSafeHttpClientSingleton Instance => lazyInstance.Value;
 
-		public HttpClient GetHttpClient()
-		{
-			// You can customize the HttpClient instance here if needed
-			return httpClient;
-		}
+    public void Dispose()
+    {
+        // Dispose of the HttpClient when the application is shutting down
+        httpClient.Dispose();
+    }
 
-		public void Dispose()
-		{
-			// Dispose of the HttpClient when the application is shutting down
-			httpClient.Dispose();
-		}
-	}
+    public HttpClient GetHttpClient()
+    {
+        // You can customize the HttpClient instance here if needed
+        return httpClient;
+    }
 }

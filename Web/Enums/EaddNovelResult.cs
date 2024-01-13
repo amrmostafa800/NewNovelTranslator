@@ -1,9 +1,8 @@
-﻿namespace Web.Enums
+﻿namespace Web.Enums;
+
+public enum EaddNovelResult
 {
-    public enum EaddNovelResult
-    {
-        Success,
-        AuthRequired,
-        ServerError
-    }
+    Success,
+    AuthRequired,
+    ServerError
 }

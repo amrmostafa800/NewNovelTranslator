@@ -1,7 +1,6 @@
-﻿namespace WebApi.DTOs
+﻿namespace WebApi.DTOs;
+
+public class TranslateDto
 {
-	public class TranslateDto
-	{
-		public required string Text { get; set; }
-	}
+    public required string Text { get; set; }
 }

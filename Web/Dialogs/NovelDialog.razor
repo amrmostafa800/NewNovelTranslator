@@ -2,7 +2,8 @@
 <MudButton OnClick="Back">Back</MudButton>
 <MudDialog>
     <DialogContent>
-        <MudButton OnClick="ShowCharacterNamesDialog" Variant="Variant.Filled">Show Character Names</MudButton>
+        <MudButton OnClick="OpenShowCharacterNamesDialog" Variant="Variant.Filled">Show Character Names</MudButton>
+        <MudButton OnClick="OpenAddCharacterNamesDialog" Variant="Variant.Filled">Add Character Names</MudButton>
         <MudButton Variant="Variant.Filled">Translator</MudButton>
     </DialogContent>
 </MudDialog>
@@ -12,18 +13,35 @@
 
     [Parameter] public int NovelId { get; set; }
 
-    void Back() => MudDialog.Cancel();
+    void Back()
+    {
+        MudDialog.Cancel();
+    }
 
-    void ShowCharacterNamesDialog()
+    void OpenShowCharacterNamesDialog()
     {
         var parameters = new DialogParameters<ShowCharacterNamesDialog>();
         parameters.Add(p => p.NovelId, NovelId);
 
-        var option = new DialogOptions()
+        var option = new DialogOptions
         {
-            FullScreen = true,
+            FullScreen = true
         };
 
         _dialogService.Show<ShowCharacterNamesDialog>("Chracter Names", parameters, option);
     }
+
+    void OpenAddCharacterNamesDialog()
+    {
+        var parameters = new DialogParameters<AddCharacterNamesDialog>();
+        parameters.Add(p => p.NovelId, NovelId);
+
+        var option = new DialogOptions
+        {
+            FullScreen = true
+        };
+
+        _dialogService.Show<AddCharacterNamesDialog>("Add Chracter Names", parameters, option);
+    }
+
 }

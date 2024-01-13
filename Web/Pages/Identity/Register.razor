@@ -1,7 +1,7 @@
 ﻿@page "/Identity/Register"
+@using Web.Services
 @using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
-@using Web.Services
 @inject UserService _userService;
 @inject IDialogService _dialogService;
 @inject NavigationManager _navigationManager;
@@ -11,22 +11,23 @@
         <MudPaper Class="pa-4">
             <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
                 <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!"
-                              Validation="@(new EmailAddressAttribute() {ErrorMessage = "The email address is invalid"})" @ref="email" />
+                              Validation="@(new EmailAddressAttribute { ErrorMessage = "The email address is invalid" })" @ref="email"/>
                 <MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="password"
                               InputType="InputType.Password"
                               Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
-                              RequiredError="Password is required!" />
+                              RequiredError="Password is required!"/>
                 <MudTextField T="string"
                               Label="Password" HelperText="Repeat the password" InputType="InputType.Password"
-                              Validation="@(new Func<string, string>(PasswordMatch))" />
+                              Validation="@(new Func<string, string>(PasswordMatch))"/>
                 <div class="d-flex align-center justify-space-between">
-                    <MudCheckBox T="bool" Required="true" RequiredError="You must agree" Label="I agree!" />
+                    <MudCheckBox T="bool" Required="true" RequiredError="You must agree" Label="I agree!"/>
                     <MudButton OnClick="Submit" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Register</MudButton>
                 </div>
             </MudForm>
         </MudPaper>
     </MudItem>
 </MudGrid>
+
 @code {
     bool success;
     string[] errors = { };
@@ -41,6 +42,7 @@
             yield return "Password is required!";
             yield break;
         }
+
         if (pass.Length < 6)
             yield return "Password must be at least of length 6";
         if (!Regex.IsMatch(pass, @"[A-Z]"))
@@ -70,7 +72,6 @@
                 _navigationManager.NavigateTo("identity/Login");
             }
         }
-        
     }
 
 }

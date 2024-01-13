@@ -1,8 +1,7 @@
-﻿namespace NovelTextProcessor.Dtos
+﻿namespace NovelTextProcessor.Dtos;
+
+internal class Index
 {
-	internal class Index
-	{
-		public int From { get; set; }
-		public int To { get; set; }
-	}
+    public int From { get; set; }
+    public int To { get; set; }
 }

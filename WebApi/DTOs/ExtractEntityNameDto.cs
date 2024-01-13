@@ -1,7 +1,6 @@
-﻿namespace WebApi.DTOs
+﻿namespace WebApi.DTOs;
+
+public class ExtractEntityNameDto
 {
-	public class ExtractEntityNameDto
-	{
-        public required string Text { get; set; }
-    }
+    public required string Text { get; set; }
 }

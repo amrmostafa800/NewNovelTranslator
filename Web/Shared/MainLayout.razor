@@ -3,17 +3,17 @@
 @inject UserService _userService
 @inject NavigationManager _navigationManager;
 
-<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" />
-<MudSwitch @bind-Checked="@_isDarkMode" Color="Color.Primary" Class="ma-4" T="bool" Label="Dark Mode" />
-<MudDialogProvider />
-<MudSnackbarProvider />
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode"/>
+<MudSwitch @bind-Checked="@_isDarkMode" Color="Color.Primary" Class="ma-4" T="bool" Label="Dark Mode"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
 
 <MudLayout>
     <MudAppBar Elevation="0">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(e => DrawerToggle())"/>
         <div class="flex-grow-1"></div>
         <MudAvatar Rounded="true" Color="Color.Secondary">
-            <MudIcon Icon="@Icons.Material.Filled.FormatListNumbered" />
+            <MudIcon Icon="@Icons.Material.Filled.FormatListNumbered"/>
             <MudMenu Class="object-fill">
                 @if (isAuth)
                 {
@@ -31,7 +31,7 @@
         <MudDrawerHeader>
             <MudText Typo="Typo.h6">Novel Translator</MudText>
         </MudDrawerHeader>
-        <NavMenu />
+        <NavMenu/>
     </MudDrawer>
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.Large" Class="my-0 pt-0">
@@ -44,7 +44,7 @@
     bool _drawerOpen = true;
     private bool _isDarkMode = true;
 
-    bool isAuth = false;
+    bool isAuth;
 
     void DrawerToggle()
     {
@@ -82,7 +82,7 @@
         await _userService.LogOut();
     }
 
-    private void OnLogin(object sender,EventArgs e)
+    private void OnLogin(object sender, EventArgs e)
     {
         isAuth = true;
     }
@@ -91,4 +91,5 @@
     {
         isAuth = false;
     }
+
 }

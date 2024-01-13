@@ -1,7 +1,6 @@
-﻿namespace WebApi.DTOs
+﻿namespace WebApi.DTOs;
+
+public class CreateNovelDto
 {
-	public class CreateNovelDto
-	{
-		public string NovelName { get; set; } = null!;
-	}
+    public string NovelName { get; set; } = null!;
 }

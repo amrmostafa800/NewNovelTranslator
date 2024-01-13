@@ -1,8 +1,7 @@
-﻿namespace WebApi.Responses
+﻿namespace WebApi.Responses;
+
+public class ErrorResponse : Response
 {
-	public class ErrorResponse : Response
-	{
-		protected override int statusCode => 400;
-		public override string? Type => "Error";
-	}
+    protected override int statusCode => 400;
+    public override string? Type => "Error";
 }

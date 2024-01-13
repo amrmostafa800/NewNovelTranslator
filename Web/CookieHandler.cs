@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Components.WebAssembly.Http;
 
-namespace Web
-{
-    public class CookieHandler : DelegatingHandler
-    {
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+namespace Web;
 
-            return await base.SendAsync(request, cancellationToken);
-        }
+public class CookieHandler : DelegatingHandler
+{
+    protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+        CancellationToken cancellationToken)
+    {
+        request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+
+        return await base.SendAsync(request, cancellationToken);
     }
 }

@@ -1,64 +1,56 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Newtonsoft.Json.Linq;
 using Web.Dto;
 using Web.Enums;
 using Web.Models;
 
-namespace Web.Services
+namespace Web.Services;
+
+public class NovelService
 {
-    public class NovelService
+    private readonly HttpClient _client;
+
+    public NovelService(HttpClient client)
     {
-        private readonly HttpClient _client;
+        _client = client;
+    }
 
-        public NovelService(HttpClient client)
+    public async Task<Novel[]> GetAllNovels()
+    {
+        try
         {
-            _client = client;
+            var novels = await _client.GetFromJsonAsync<Novel[]>("api/Novel")!;
+            if (novels != null) return novels;
+            return Array.Empty<Novel>();
         }
-
-        public async Task<Novel[]> GetAllNovels()
+        catch (Exception ex)
         {
-            try
-            {
-                var novels = await _client.GetFromJsonAsync<Novel[]>($"api/Novel")!;
-                if (novels != null)
-                {
-                    return novels;
-                }
-                return Array.Empty<Novel>();
-            }
-            catch (Exception ex)
-            {
-                // Log or handle the exception appropriately
-                Console.WriteLine($"Error fetching novels: {ex.Message}");
-                return Array.Empty<Novel>();
-            }
+            // Log or handle the exception appropriately
+            Console.WriteLine($"Error fetching novels: {ex.Message}");
+            return Array.Empty<Novel>();
         }
+    }
 
-        public async Task<EaddNovelResult> AddNovel(string novelName)
+    public async Task<EaddNovelResult> AddNovel(string novelName)
+    {
+        AddNovelDto addNovel = new()
         {
-            AddNovelDto addNovel = new()
-            {
-                novelName = novelName
-            };
+            novelName = novelName
+        };
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5000/api/Novel");
+        var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5000/api/Novel");
 
-            request.Headers.Add("accept", "*/*");
+        request.Headers.Add("accept", "*/*");
 
-            request.Content = new StringContent(JObject.FromObject(addNovel).ToString());
-            request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        request.Content = new StringContent(JObject.FromObject(addNovel).ToString());
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-            HttpResponseMessage response = await _client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                return EaddNovelResult.Success;
-            }
-            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                return EaddNovelResult.AuthRequired;
-            }
-            return EaddNovelResult.ServerError;
-        }
+        var response = await _client.SendAsync(request);
+        if (response.IsSuccessStatusCode)
+            return EaddNovelResult.Success;
+        if (response.StatusCode == HttpStatusCode.Unauthorized) return EaddNovelResult.AuthRequired;
+        return EaddNovelResult.ServerError;
     }
 }

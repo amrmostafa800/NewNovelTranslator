@@ -1,106 +1,110 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Net;
+using System.Net.Http.Headers;
+using Newtonsoft.Json.Linq;
 using NovelTextProcessor.Dtos;
 using NovelTextProcessor.Helpers;
-using System.Net.Http.Headers;
 
-namespace NovelTextProcessor
+namespace NovelTextProcessor;
+
+public class TextTranslator // TDO Use Paging to control Amount Of Thereds
 {
-	public class TextTranslator // TDO Use Paging to control Amount Of Thereds
-	{
-		private readonly HttpClient httpClient;
+    private readonly HttpClient httpClient;
+    private readonly int _maxRetry = 20;
 
-		public TextTranslator()
-		{
-			this.httpClient = ThreadSafeHttpClientSingleton.Instance.GetHttpClient();
-		}
-		public static TextTranslator Instance { get; } = new TextTranslator();
+    private int _retry;
 
-		int _retry = 0;
-		int _maxRetry = 20;
+    public TextTranslator()
+    {
+        httpClient = ThreadSafeHttpClientSingleton.Instance.GetHttpClient();
+    }
 
-		public async Task<IEnumerable<string>> SendRequestsAsync(IEnumerable<string> arrayOfText)
-		{
-			var tasks = new List<Task<string>>();
+    public static TextTranslator Instance { get; } = new();
 
-			foreach (var text in arrayOfText)
-			{
-				//var task = Task.Run(() => SendRequestAsync(text)); // Multi Thereds
-				var task = SendRequestAsync(text); // async programing without create new Thered
-				tasks.Add(task);
-			}
+    public async Task<IEnumerable<string>> SendRequestsAsync(IEnumerable<string> arrayOfText)
+    {
+        var tasks = new List<Task<string>>();
 
-			await Task.WhenAll(tasks);
+        foreach (var text in arrayOfText)
+        {
+            //var task = Task.Run(() => SendRequestAsync(text)); // Multi Thereds
+            var task = SendRequestAsync(text); // async programing without create new Thered
+            tasks.Add(task);
+        }
 
-			var results = tasks.Select(task => task.Result);
+        await Task.WhenAll(tasks);
 
-			return results;
-		}
+        var results = tasks.Select(task => task.Result);
 
-		public async Task<string> SendRequestAsync(string Text)
-		{
-			var timeTicks = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-			var verifyToken = $"webkey_E3sTuMjpP8Jez49GcYpDVH7r#{timeTicks}#{Text}";
+        return results;
+    }
 
-			var hash = MD5Helper.NewMD5(verifyToken);
+    public async Task<string> SendRequestAsync(string Text)
+    {
+        var timeTicks = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        var verifyToken = $"webkey_E3sTuMjpP8Jez49GcYpDVH7r#{timeTicks}#{Text}";
 
-			var requestBody = new TranslationRequestDto
-			{
-				multiline = true,
-				source = "en", //if enpty api accept any lang
-				target = "ar",
-				q = Text,
-				hints = "",
-				ts = timeTicks,
-				verify = hash
-			};
+        var hash = MD5Helper.NewMD5(verifyToken);
 
-			HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://webapi.modernmt.com/translate");
+        var requestBody = new TranslationRequestDto
+        {
+            multiline = true,
+            source = "en", //if enpty api accept any lang
+            target = "ar",
+            q = Text,
+            hints = "",
+            ts = timeTicks,
+            verify = hash
+        };
 
-			request.Headers.Add("authority", "webapi.modernmt.com");
-			request.Headers.Add("accept", "application/json, text/plain, */*");
-			request.Headers.Add("accept-language", "ar,en;q=0.9");
-			request.Headers.Add("dnt", "1");
-			request.Headers.Add("origin", "https://www.modernmt.com");
-			request.Headers.Add("referer", "https://www.modernmt.com/");
-			request.Headers.Add("sec-ch-ua", "\"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114\"");
-			request.Headers.Add("sec-ch-ua-mobile", "?0");
-			request.Headers.Add("sec-ch-ua-platform", "\"Windows\"");
-			request.Headers.Add("sec-fetch-dest", "empty");
-			request.Headers.Add("sec-fetch-mode", "cors");
-			request.Headers.Add("sec-fetch-site", "same-site");
-			request.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
-			request.Headers.Add("x-http-method-override", "GET");
+        var request = new HttpRequestMessage(HttpMethod.Post, "https://webapi.modernmt.com/translate");
 
-			request.Content = new StringContent(JObject.FromObject(requestBody).ToString());
-			request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        request.Headers.Add("authority", "webapi.modernmt.com");
+        request.Headers.Add("accept", "application/json, text/plain, */*");
+        request.Headers.Add("accept-language", "ar,en;q=0.9");
+        request.Headers.Add("dnt", "1");
+        request.Headers.Add("origin", "https://www.modernmt.com");
+        request.Headers.Add("referer", "https://www.modernmt.com/");
+        request.Headers.Add("sec-ch-ua",
+            "\"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114\"");
+        request.Headers.Add("sec-ch-ua-mobile", "?0");
+        request.Headers.Add("sec-ch-ua-platform", "\"Windows\"");
+        request.Headers.Add("sec-fetch-dest", "empty");
+        request.Headers.Add("sec-fetch-mode", "cors");
+        request.Headers.Add("sec-fetch-site", "same-site");
+        request.Headers.Add("user-agent",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36");
+        request.Headers.Add("x-http-method-override", "GET");
 
-			try
-			{
-				var response = await httpClient.SendAsync(request);
-				var responseBody = await response.Content.ReadAsStringAsync();
+        request.Content = new StringContent(JObject.FromObject(requestBody).ToString());
+        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-				if (response.StatusCode == System.Net.HttpStatusCode.OK)
-				{
-					_retry = 0; // Reset Retry
-					JObject jsonObject = JObject.Parse(responseBody);
+        try
+        {
+            var response = await httpClient.SendAsync(request);
+            var responseBody = await response.Content.ReadAsStringAsync();
 
-					JToken translationToken = jsonObject.SelectToken("data.translation")!;
-					return translationToken!.ToString();
-				}
-				else if (_retry >= _maxRetry)
-				{
-					return null!;
-				}
-			}
-			catch (Exception ex)
-			{
-				File.AppendAllText("Exception.txt", ex.Message + Environment.NewLine);
-			}
-			finally
-			{
-				_retry++;
-			}
-			return await SendRequestAsync(Text);
-		}
-	}
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                _retry = 0; // Reset Retry
+                var jsonObject = JObject.Parse(responseBody);
+
+                var translationToken = jsonObject.SelectToken("data.translation")!;
+                return translationToken!.ToString();
+            }
+            else if (_retry >= _maxRetry)
+            {
+                return null!;
+            }
+        }
+        catch (Exception ex)
+        {
+            File.AppendAllText("Exception.txt", ex.Message + Environment.NewLine);
+        }
+        finally
+        {
+            _retry++;
+        }
+
+        return await SendRequestAsync(Text);
+    }
 }
