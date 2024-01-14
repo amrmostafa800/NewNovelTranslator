@@ -1,7 +1,7 @@
-﻿@inject IDialogService _dialogService
-<MudButton OnClick="Back">Back</MudButton>
+﻿@inject IDialogService DialogService
 <MudDialog>
     <DialogContent>
+        <MudButton OnClick="Back">Back</MudButton>
         <MudButton OnClick="OpenShowCharacterNamesDialog" Variant="Variant.Filled">Show Character Names</MudButton>
         <MudButton OnClick="OpenAddCharacterNamesDialog" Variant="Variant.Filled">Add Character Names</MudButton>
         <MudButton Variant="Variant.Filled">Translator</MudButton>
@@ -28,7 +28,7 @@
             FullScreen = true
         };
 
-        _dialogService.Show<ShowCharacterNamesDialog>("Chracter Names", parameters, option);
+        DialogService.Show<ShowCharacterNamesDialog>("Character Names", parameters, option);
     }
 
     void OpenAddCharacterNamesDialog()
@@ -41,7 +41,7 @@
             FullScreen = true
         };
 
-        _dialogService.Show<AddCharacterNamesDialog>("Add Chracter Names", parameters, option);
+        DialogService.Show<AddCharacterNamesDialog>("Add Character Names", parameters, option);
     }
 
 }

@@ -14,7 +14,7 @@
                 <MudTd DataLabel="EnglishName">@context.englishName</MudTd>
                 <MudTd DataLabel="ArabicName">@context.arabicName</MudTd>
                 <MudTd DataLabel="Gender">@context.gender</MudTd>
-                <MudTd Class="invisible" DataLabel="Id">@context.id</MudTd>
+                <MudTd Class="invisible" DataLabel="Id">@context.Id</MudTd>
             </RowTemplate>
             <RowEditingTemplate>
                 <MudTd DataLabel="englishName">
@@ -26,7 +26,7 @@
                 <MudTd DataLabel="gender">
                     <MudTextField @bind-Value="@context.gender" Required/>
                 </MudTd>
-                <MudTd DataLabel="id">@context.id</MudTd>
+                <MudTd DataLabel="id">@context.Id</MudTd>
             </RowEditingTemplate>
         </MudTable>
     </DialogContent>
@@ -42,10 +42,10 @@
         MudDialog.Cancel();
     }
 
-    private CharacterName _selectedItem1;
+    private CharacterName _selectedItem1 = null!;
     CharacterName[]? _characterNames;
     private CharacterName? _characterNameBeforeEdit;
-    private readonly List<string> _editEvents = new();
+    //private readonly List<string> _editEvents = new();
     private readonly TableEditTrigger _editTrigger = TableEditTrigger.RowClick;
 
 
@@ -56,7 +56,7 @@
 
     private void AddEditionEvent(string message)
     {
-        _editEvents.Add(message);
+        //_editEvents.Add(message);
         StateHasChanged();
     }
 

@@ -13,6 +13,32 @@ public class CharacterNameService
         _client = client;
     }
 
+    public async Task<bool> SendEntityNamesByNovelId(List<AddCharacterName> characterNames,int novelId)
+    {
+        var json = new
+        {
+            entityNames = characterNames,
+            novelId = novelId
+        };
+        
+        try
+        {
+            var response = await _client.PostAsJsonAsync($"api/EntityName",json)!;
+
+            if (await response.Content.ReadAsStringAsync() == "true")
+            {
+                return true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching EntityNames: {ex.Message}");
+            return false;
+        }
+
+        return false;
+    }
+    
     public async Task<CharacterName[]> GetAllEntityNamesByNovelId(int novelId)
     {
         try

@@ -29,7 +29,7 @@ public class EntityNameController : ControllerBase //TDO use DataProtectionProvi
     }
 
     [HttpGet("{id}")]
-    public IActionResult GetEntityNameById(int id)
+    public IActionResult GetEntityNamesById(int id)
     {
         var entityNames = _entityNameService.GetEntityNamesByNovelId(id);
 

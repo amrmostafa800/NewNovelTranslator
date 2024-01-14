@@ -35,7 +35,7 @@ public class EntityNameService
         var entityNamesTask = entityNameDto.EntityNames.Select(async e => new EntityName
         {
             EnglishName = e.EnglishName,
-            ArabicName = await TextTranslator.Instance.SendRequestAsync(e.EnglishName),
+            ArabicName = await TextTranslator.Instance.SendRequestAsync(e.EnglishName), // Translate English Name To Arabic
             Gender = e.Gender,
             NovelId = entityNameDto.NovelId
         }).ToList();

@@ -1,27 +1,29 @@
 ﻿@using Web.Models
 @using Web.Services
+@using Web.Dialogs.SubDialog
 @inject CharacterNameService CharacterNameService
+@inject IDialogService DialogService;
 
-<MudButton OnClick="Back">Back</MudButton>
-<MudDialog>
+<MudDialog Class="overflow-scroll">
     <DialogContent>
+        <MudButton FullWidth="true" OnClick="@Back">Back</MudButton>
         <MudButton OnClick="@AddCharacterName" Color="@Color.Success" Class="add-item-btn">Add Character Name</MudButton>
-        <MudDataGrid T="CharacterName" Items="@_characterNames" ReadOnly="false" EditMode="@DataGridEditMode.Cell"
+        <MudButton OnClick="@ExtractCharacterNamesFromTextByAi" Color="@Color.Default" Class="add-item-btn">Extract Character Names By AI</MudButton>
+        <MudDataGrid T="AddCharacterName" Items="@_characterNames" ReadOnly="false" EditMode="@DataGridEditMode.Cell"
                      Bordered="true" Dense="true" EditTrigger="@DataGridEditTrigger.OnRowClick">
             <Columns>
-                <PropertyColumn Property="x => x.englishName"/>
-                <PropertyColumn Property="x => x.arabicName"/>
+                <PropertyColumn Property="x => x.englishName"> </PropertyColumn>
                 <PropertyColumn Property="x => x.gender">
                     <EditTemplate>
-                        <MudSelect T="string" @bind-Value="context.Item.gender" Required RequiredError="You must select a Position!!!" Margin="@Margin.Dense">
-                            <MudSelectItem Value="@("M")">Male</MudSelectItem>
-                            <MudSelectItem Value="@("F")">Female</MudSelectItem>
+                        <MudSelect T="char" @bind-Value="context.Item.gender" Required RequiredError="You must select a Position!!!" Margin="@Margin.Dense">
+                            <MudSelectItem Value="@('M')">Male</MudSelectItem>
+                            <MudSelectItem Value="@('F')">Female</MudSelectItem>
                         </MudSelect>
                     </EditTemplate>
                 </PropertyColumn>
-
             </Columns>
         </MudDataGrid>
+        <MudButton Color="Color.Default" FullWidth="true" OnClick="@Submit">Submit</MudButton>
     </DialogContent>
 </MudDialog>
 
@@ -30,31 +32,66 @@
 
     [Parameter] public int NovelId { get; set; }
 
-    List<CharacterName>? _characterNames;
+    List<AddCharacterName>? _characterNames;
 
     void Back()
     {
         MudDialog.Cancel();
     }
 
-    protected override async Task OnInitializedAsync()
+    async Task Submit()
     {
-        _characterNames = new List<CharacterName>();
+        //Validate _characterNames is not empty
+        if (_characterNames?.Count == 0)
+        {
+            await DialogService.ShowMessageBox("Error", "Please Add One Character Name At Last");
+            return;
+        }
+        
+        //Submit Character Names With To This Novel
+        await CharacterNameService.SendEntityNamesByNovelId(_characterNames!, NovelId);
+        
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+
+    protected override void OnInitialized()
+    {
+        _characterNames = new List<AddCharacterName>();
     }
 
     void AddCharacterName()
     {
-        _characterNames.Add(new CharacterName()
+        _characterNames?.Add(new AddCharacterName()
         {
-            arabicName = "",
             englishName = "",
-            gender = "M",
-            id = 0
+            gender = 'M',
+        });
+    }
+    
+    void AddCharacterName(string englishName)
+    {
+        _characterNames?.Add(new AddCharacterName()
+        {
+            englishName = englishName,
         });
     }
 
-    void OpenExtractCharacterNamesFromTextDialog()
+    async Task ExtractCharacterNamesFromTextByAi()
     {
-        //TDO
+        //Open Text Dialog
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = await DialogService.ShowAsync<TextBoxDialog>("Enter Novel Text", options);
+        var dialogResult = await dialog.Result;
+        
+        //Get Text From Dialog
+        var text = dialogResult.Data.ToString();
+        
+        //Extract CharacterNames From Text By AI
+        var characterNames = await CharacterNameService.ExtractEntityNamesFromText(text!);
+
+        foreach (var name in characterNames)
+        {
+            AddCharacterName(name);
+        }
     }
 }

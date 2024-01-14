@@ -1,0 +1,30 @@
+﻿@inject IDialogService DialogService;
+
+<MudDialog>
+    <DialogContent>
+        <MudTextField T="string" @ref="_mudText" Lines="5" Label="Text" Variant="Variant.Text" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    MudTextField<string> _mudText = new();
+
+    void Submit()
+    {
+        if (!string.IsNullOrEmpty(_mudText.Text))
+        {
+            MudDialog.Close(DialogResult.Ok(_mudText.Text));
+        }
+        else
+        {
+            DialogService.ShowMessageBox("Text Required", "You Must Enter Text");
+        }
+    }
+    void Cancel() => MudDialog.Cancel();
+}
