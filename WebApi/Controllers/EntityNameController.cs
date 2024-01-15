@@ -72,7 +72,7 @@ public class EntityNameController : ControllerBase //TDO use DataProtectionProvi
     //TDO i think i will make only gender EditAble Here Later To Dont Broke Replace Bycouse Replace i will order by length (if i dont it will bug when have firstName only in line and other line with firstName lastName) so better make only gender editAble or ReOrderBy every edit (i will look at it when Finsh NLP NER Controller(Extract Names By Ai))
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<IActionResult> Update(int id, [FromBody] string NewEnglishName, char gender)
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateEntityName entityNameDetails)
     {
         //Check For permission
         var userId = _GetCurrentUserId();
@@ -82,7 +82,7 @@ public class EntityNameController : ControllerBase //TDO use DataProtectionProvi
                 Description = "You Dont Have Permission On This Novel"
             };
         //Update EntityName
-        await _entityNameService.UpdateEntityName(id, NewEnglishName, gender);
+        await _entityNameService.UpdateEntityName(id, entityNameDetails.EnglishName, entityNameDetails.ArabicName ,entityNameDetails.Gender);
         return Ok("Edited");
     }
 

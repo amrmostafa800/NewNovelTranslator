@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using Newtonsoft.Json;
+using Web.Enums;
 using Web.Models;
 
 namespace Web.Services;
@@ -13,7 +14,7 @@ public class CharacterNameService
         _client = client;
     }
 
-    public async Task<bool> SendEntityNamesByNovelId(List<AddCharacterName> characterNames,int novelId)
+    public async Task<EaddEntityNameResult> AddEntityNamesByNovelId(List<AddCharacterName> characterNames,int novelId)
     {
         var json = new
         {
@@ -24,15 +25,47 @@ public class CharacterNameService
         try
         {
             var response = await _client.PostAsJsonAsync($"api/EntityName",json)!;
+            var responseResult = await response.Content.ReadAsStringAsync();
 
-            if (await response.Content.ReadAsStringAsync() == "true")
+            if (responseResult.Contains("true"))
+            {
+                return EaddEntityNameResult.Success;
+            } 
+            if (responseResult.Contains("One Of EntityNames Or More Exist"))
+            {
+                return EaddEntityNameResult.IsExist;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error : {ex.Message}");
+            return EaddEntityNameResult.ServerError;
+        }
+
+        return EaddEntityNameResult.AuthRequired;
+    }
+
+    public async Task<bool> UpdateEntityNameById(CharacterName characterName)
+    {
+        var json = new
+        {
+            characterName.englishName,
+            characterName.gender,
+            characterName.arabicName
+        };
+        
+        try
+        {
+            var response = await _client.PutAsJsonAsync($"api/EntityName/{characterName.Id}",json)!;
+            
+            if (await response.Content.ReadAsStringAsync() == "Edited")
             {
                 return true;
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching EntityNames: {ex.Message}");
+            Console.WriteLine($"Error : {ex.Message}");
             return false;
         }
 
@@ -44,12 +77,15 @@ public class CharacterNameService
         try
         {
             var novels = await _client.GetFromJsonAsync<CharacterName[]>($"api/EntityName/{novelId}")!;
-            if (novels != null) return novels;
+            
+            if (novels != null) 
+                return novels;
+            
             return Array.Empty<CharacterName>();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching EntityNames: {ex.Message}");
+            Console.WriteLine($"Error : {ex.Message}");
             return Array.Empty<CharacterName>();
         }
     }
@@ -74,7 +110,7 @@ public class CharacterNameService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error fetching EntityNames: {ex.Message}");
+            Console.WriteLine($"Error : {ex.Message}");
             return Array.Empty<string>();
         }
     }

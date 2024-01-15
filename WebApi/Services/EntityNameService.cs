@@ -64,13 +64,14 @@ public class EntityNameService
     //	return 0; // failed
     //}
 
-    public async Task<bool> UpdateEntityName(int id, string newEnglishName, char gender)
+    public async Task<bool> UpdateEntityName(int id, string newEnglishName,string newArabicName, char gender)
     {
         var entityName = _context.EntityNames.FirstOrDefault(n => n.Id == id);
         if (entityName == null) return false;
         entityName.EnglishName = newEnglishName;
         entityName.Gender = gender;
-        entityName.ArabicName = await TextTranslator.Instance.SendRequestAsync(newEnglishName);
+        //entityName.ArabicName = await TextTranslator.Instance.SendRequestAsync(newEnglishName);
+        entityName.ArabicName = newArabicName;
 
         _context.EntityNames.Update(entityName);
         await _context.SaveChangesAsync();

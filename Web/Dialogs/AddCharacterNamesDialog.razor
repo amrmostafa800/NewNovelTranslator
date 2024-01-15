@@ -1,6 +1,7 @@
 ﻿@using Web.Models
 @using Web.Services
 @using Web.Dialogs.SubDialog
+@using Web.Enums
 @inject CharacterNameService CharacterNameService
 @inject IDialogService DialogService;
 
@@ -54,7 +55,23 @@
         }
         
         //Submit Character Names With To This Novel
-        await CharacterNameService.SendEntityNamesByNovelId(_characterNames!, NovelId);
+        var submitResult = await CharacterNameService.AddEntityNamesByNovelId(_characterNames!, NovelId);
+
+        switch (submitResult)
+        {
+            case EaddEntityNameResult.Success:
+                await DialogService.ShowMessageBox("Success", "Character Names Has Been Added");
+                break;
+                case EaddEntityNameResult.AuthRequired:
+                await DialogService.ShowMessageBox("Auth Required", "Please Login First");
+                break;
+            case EaddEntityNameResult.IsExist:
+                await DialogService.ShowMessageBox("Already Exist", "One Of More Of Character Names Is Already Exist");
+                break;
+            case EaddEntityNameResult.ServerError:
+                await DialogService.ShowMessageBox("Error", "Failed To Connect To Server, Please Report");
+                break;
+        }
         
         MudDialog.Close(DialogResult.Ok(true));
     }

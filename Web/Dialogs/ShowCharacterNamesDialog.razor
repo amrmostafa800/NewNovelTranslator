@@ -1,10 +1,12 @@
 ﻿@using Web.Models
 @using Web.Services
-@inject CharacterNameService EntityNamesService
+@inject CharacterNameService CharacterNameService
+@inject IDialogService DialogService
+
 <MudButton OnClick="Back">Back</MudButton>
 <MudDialog>
     <DialogContent>
-        <MudTable Items="@_characterNames" @bind-SelectedItem="_selectedItem1" Hover="true" Breakpoint="Breakpoint.Sm" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues">
+        <MudTable Items="@_characterNames" @bind-SelectedItem="_selectedItem1" Hover="true" Breakpoint="Breakpoint.Sm" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" RowEditCommit="ItemHasBeenCommitted">
             <HeaderContent>
                 <MudTh>EnglishName</MudTh>
                 <MudTh>ArabicName</MudTh>
@@ -26,7 +28,7 @@
                 <MudTd DataLabel="gender">
                     <MudTextField @bind-Value="@context.gender" Required/>
                 </MudTd>
-                <MudTd DataLabel="id">@context.Id</MudTd>
+                @*<MudTd DataLabel="id">@context.Id</MudTd>*@
             </RowEditingTemplate>
         </MudTable>
     </DialogContent>
@@ -45,19 +47,11 @@
     private CharacterName _selectedItem1 = null!;
     CharacterName[]? _characterNames;
     private CharacterName? _characterNameBeforeEdit;
-    //private readonly List<string> _editEvents = new();
-    private readonly TableEditTrigger _editTrigger = TableEditTrigger.RowClick;
 
 
     protected override async Task OnInitializedAsync()
     {
-        _characterNames = await EntityNamesService.GetAllEntityNamesByNovelId(NovelId);
-    }
-
-    private void AddEditionEvent(string message)
-    {
-        //_editEvents.Add(message);
-        StateHasChanged();
+        _characterNames = await CharacterNameService.GetAllEntityNamesByNovelId(NovelId);
     }
 
     private void BackupItem(object element)
@@ -68,7 +62,7 @@
             arabicName = ((CharacterName)element).arabicName,
             gender = ((CharacterName)element).gender
         };
-        AddEditionEvent($"RowEditPreview event: made a backup of Element {((CharacterName)element).englishName}");
+        StateHasChanged();
     }
 
     private void ResetItemToOriginalValues(object element)
@@ -76,7 +70,18 @@
         ((CharacterName)element).englishName = _characterNameBeforeEdit!.englishName;
         ((CharacterName)element).arabicName = _characterNameBeforeEdit!.arabicName;
         ((CharacterName)element).gender = _characterNameBeforeEdit!.gender;
-        AddEditionEvent($"RowEditCancel event: Editing of Element {((CharacterName)element).englishName} canceled");
+        StateHasChanged();
     }
 
+    private async void ItemHasBeenCommitted(object element)
+    {
+        var characterName = element as CharacterName;
+
+        if (characterName is null)
+            return;
+        
+        //Call Update API
+        await CharacterNameService.UpdateEntityNameById(characterName);
+    }
+    
 }
