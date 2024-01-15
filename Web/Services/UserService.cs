@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Json;
-using Web.Dto;
 
 namespace Web.Services;
 
@@ -17,7 +16,7 @@ public class UserService
 
     public async Task<bool> Register(string email, string password)
     {
-        AccountDto register = new()
+        var register = new
         {
             email = email,
             password = password
@@ -30,7 +29,7 @@ public class UserService
 
     public async Task<bool> Login(string email, string password)
     {
-        AccountDto login = new()
+        var login = new
         {
             email = email,
             password = password

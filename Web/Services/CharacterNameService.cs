@@ -18,7 +18,7 @@ public class CharacterNameService
         var json = new
         {
             entityNames = characterNames,
-            novelId = novelId
+            novelId
         };
         
         try

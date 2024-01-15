@@ -2,7 +2,6 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Newtonsoft.Json.Linq;
-using Web.Dto;
 using Web.Enums;
 using Web.Models;
 
@@ -35,9 +34,9 @@ public class NovelService
 
     public async Task<EaddNovelResult> AddNovel(string novelName)
     {
-        AddNovelDto addNovel = new()
+        var addNovel = new
         {
-            novelName = novelName
+            novelName
         };
 
         var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5000/api/Novel");

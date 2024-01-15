@@ -21,6 +21,11 @@
                         </MudSelect>
                     </EditTemplate>
                 </PropertyColumn>
+                <TemplateColumn>
+                    <EditTemplate>
+                    <MudButton OnClick="@(()=> RemoveCharacterName(context.Item))">Remove</MudButton>
+                    </EditTemplate>
+                </TemplateColumn>
             </Columns>
         </MudDataGrid>
         <MudButton Color="Color.Default" FullWidth="true" OnClick="@Submit">Submit</MudButton>
@@ -68,6 +73,11 @@
         });
     }
     
+    void RemoveCharacterName(AddCharacterName item)
+    {
+        _characterNames?.Remove(item);
+    }
+    
     void AddCharacterName(string englishName)
     {
         _characterNames?.Add(new AddCharacterName()
@@ -81,8 +91,12 @@
         //Open Text Dialog
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var dialog = await DialogService.ShowAsync<TextBoxDialog>("Enter Novel Text", options);
+        
         var dialogResult = await dialog.Result;
         
+        if (dialogResult.Canceled)
+            return;
+
         //Get Text From Dialog
         var text = dialogResult.Data.ToString();
         
