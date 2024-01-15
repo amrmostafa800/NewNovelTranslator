@@ -17,7 +17,7 @@ public class EntityNameService
 
     public List<EntityName> GetEntityNamesByNovelId(int novelId)
     {
-        return _context.EntityNames.Where(n => n.NovelId == novelId).OrderBy(n => n.EnglishName.Length).ToList();
+        return _context.EntityNames.Where(n => n.NovelId == novelId).OrderByDescending(n => n.EnglishName.Length).ToList();
     }
 
     public async Task<bool> AddManyEntityNames(EntityNameDto entityNameDto)
