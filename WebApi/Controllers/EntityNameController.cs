@@ -62,6 +62,7 @@ public class EntityNameController : ControllerBase //TDO use DataProtectionProvi
         var entityNamesAddResult = await _entityNameService.AddManyEntityNames(entityName);
         if (entityNamesAddResult) // If Add Not Failed
             return NoContent();
+        
         return new ErrorResponse
         {
             Description = "One Of EntityNames Or More Exist"

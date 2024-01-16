@@ -1,11 +1,11 @@
 ﻿@inject IDialogService DialogService
 <MudDialog>
     <DialogContent>
-        <MudButton FullWidth="true" OnClick="Back">Back</MudButton>
+        <MudButton FullWidth="true" OnClick="@Back">Back</MudButton>
         <br/>
-        <MudButton OnClick="OpenShowCharacterNamesDialog" Variant="Variant.Filled">Show Character Names</MudButton>
-        <MudButton OnClick="OpenAddCharacterNamesDialog" Variant="Variant.Filled">Add Character Names</MudButton>
-        <MudButton Variant="Variant.Filled">Translator</MudButton>
+        <MudButton OnClick="@OpenShowCharacterNamesDialog" Variant="Variant.Filled">Show Character Names</MudButton>
+        <MudButton OnClick="@OpenAddCharacterNamesDialog" Variant="Variant.Filled">Add Character Names</MudButton>
+        <MudButton OnClick="@OpenNovelTranslatorDialog" Variant="Variant.Filled">Translator</MudButton>
     </DialogContent>
 </MudDialog>
 
@@ -44,5 +44,17 @@
 
         DialogService.Show<AddCharacterNamesDialog>("Add Character Names", parameters, option);
     }
+    
+    void OpenNovelTranslatorDialog()
+    {
+        var parameters = new DialogParameters<NovelTranslatorDialog>();
+        parameters.Add(p => p.NovelId, NovelId);
 
+        var option = new DialogOptions
+        {
+            FullScreen = true
+        };
+
+        DialogService.Show<NovelTranslatorDialog>("Translator", parameters, option);
+    }
 }

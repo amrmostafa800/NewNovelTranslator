@@ -1,0 +1,27 @@
+﻿@using Web.Services
+@inject NovelService NovelService
+<MudDialog>
+    <DialogContent>
+        <MudButton FullWidth="true" OnClick="@Back">Back</MudButton>
+        <MudTextField Lines="10" T="string" @ref="_textBeforeTranslate" Label="English Novel Text" Variant="Variant.Filled"></MudTextField>
+        <MudTextField Lines="10" T="string" @ref="_textAfterTranslate" Variant="Variant.Filled"></MudTextField>
+    </DialogContent>
+    <DialogActions>
+        <MudButton FullWidth="true" Color="Color.Primary" OnClick="@Submit">Translate</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter] public int NovelId { get; set; }
+    
+    private MudTextField<string>? _textBeforeTranslate;
+    private MudTextField<string>? _textAfterTranslate;
+
+    async Task Submit()
+    {
+        var translatedText = await NovelService.Translate(_textBeforeTranslate!.Text, NovelId);
+        _textAfterTranslate!.Text = translatedText;
+    }
+    void Back() => MudDialog.Cancel();
+}

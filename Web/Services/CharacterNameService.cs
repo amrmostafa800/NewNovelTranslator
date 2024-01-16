@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net;
+using System.Net.Http.Json;
 using Newtonsoft.Json;
 using Web.Enums;
 using Web.Models;
@@ -27,7 +28,7 @@ public class CharacterNameService
             var response = await _client.PostAsJsonAsync($"api/EntityName",json)!;
             var responseResult = await response.Content.ReadAsStringAsync();
 
-            if (responseResult.Contains("true"))
+            if (response.StatusCode == HttpStatusCode.NoContent)
             {
                 return EEntityNameResult.Success;
             } 

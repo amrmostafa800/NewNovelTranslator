@@ -52,4 +52,28 @@ public class NovelService
         if (response.StatusCode == HttpStatusCode.Unauthorized) return EaddNovelResult.AuthRequired;
         return EaddNovelResult.ServerError;
     }
+
+    public async Task<string> Translate(string text,int novelId)
+    {
+        var json = new
+        {
+            text
+        };
+        
+        try
+        {
+            var response = await _client.PostAsJsonAsync($"api/Translate/{novelId}",json)!;
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return responseContent;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error : {ex.Message}");
+            return String.Empty;
+        }
+        return String.Empty;
+    }
 }
