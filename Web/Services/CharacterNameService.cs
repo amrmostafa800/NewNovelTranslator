@@ -14,7 +14,7 @@ public class CharacterNameService
         _client = client;
     }
 
-    public async Task<EaddEntityNameResult> AddEntityNamesByNovelId(List<AddCharacterName> characterNames,int novelId)
+    public async Task<EEntityNameResult> AddEntityNamesByNovelId(List<AddCharacterName> characterNames,int novelId)
     {
         var json = new
         {
@@ -29,23 +29,48 @@ public class CharacterNameService
 
             if (responseResult.Contains("true"))
             {
-                return EaddEntityNameResult.Success;
+                return EEntityNameResult.Success;
             } 
             if (responseResult.Contains("One Of EntityNames Or More Exist"))
             {
-                return EaddEntityNameResult.IsExist;
+                return EEntityNameResult.IsExist;
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error : {ex.Message}");
-            return EaddEntityNameResult.ServerError;
+            return EEntityNameResult.ServerError;
         }
 
-        return EaddEntityNameResult.AuthRequired;
+        return EEntityNameResult.AuthRequired;
     }
 
-    public async Task<bool> UpdateEntityNameById(CharacterName characterName)
+    public async Task<EEntityNameResult> RemoveEntityNameById(int entityNameId)
+    {
+        try
+        {
+            var response = await _client.DeleteAsync($"api/EntityName/{entityNameId}")!;
+            var responseResult = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                return EEntityNameResult.Success;
+            }
+            if (responseResult.Contains("You Dont Have Permission On This Novel"))
+            {
+                return EEntityNameResult.AuthRequired;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error : {ex.Message}");
+            return EEntityNameResult.ServerError;
+        }
+        
+        return EEntityNameResult.AuthRequired;
+    }
+    
+    public async Task<EEntityNameResult> UpdateEntityNameById(CharacterName characterName)
     {
         var json = new
         {
@@ -60,33 +85,33 @@ public class CharacterNameService
             
             if (await response.Content.ReadAsStringAsync() == "Edited")
             {
-                return true;
+                return EEntityNameResult.Success;
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error : {ex.Message}");
-            return false;
+            return EEntityNameResult.ServerError;
         }
 
-        return false;
+        return EEntityNameResult.NoPermission;
     }
     
-    public async Task<CharacterName[]> GetAllEntityNamesByNovelId(int novelId)
+    public async Task<List<CharacterName>> GetAllEntityNamesByNovelId(int novelId)
     {
         try
         {
             var novels = await _client.GetFromJsonAsync<CharacterName[]>($"api/EntityName/{novelId}")!;
             
             if (novels != null) 
-                return novels;
-            
-            return Array.Empty<CharacterName>();
+                return novels.ToList();
+
+            return new List<CharacterName>();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error : {ex.Message}");
-            return Array.Empty<CharacterName>();
+            return new List<CharacterName>();
         }
     }
 

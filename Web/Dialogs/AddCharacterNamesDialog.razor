@@ -59,16 +59,16 @@
 
         switch (submitResult)
         {
-            case EaddEntityNameResult.Success:
+            case EEntityNameResult.Success:
                 await DialogService.ShowMessageBox("Success", "Character Names Has Been Added");
                 break;
-                case EaddEntityNameResult.AuthRequired:
+                case EEntityNameResult.AuthRequired:
                 await DialogService.ShowMessageBox("Auth Required", "Please Login First");
                 break;
-            case EaddEntityNameResult.IsExist:
+            case EEntityNameResult.IsExist:
                 await DialogService.ShowMessageBox("Already Exist", "One Of More Of Character Names Is Already Exist");
                 break;
-            case EaddEntityNameResult.ServerError:
+            case EEntityNameResult.ServerError:
                 await DialogService.ShowMessageBox("Error", "Failed To Connect To Server, Please Report");
                 break;
         }

@@ -12,7 +12,7 @@ namespace WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class EntityNameController : ControllerBase //TDO use DataProtectionProvider to create protector to encrypt ID
+public class EntityNameController : ControllerBase //TDO use DataProtectionProvider to create protector to encrypt ID - Refactor Controllers (To make code more clean)
 {
     private readonly EntityNameService _entityNameService;
     private readonly IValidator<EntityNameDto> _EntityNameValidator;

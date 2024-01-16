@@ -4,12 +4,10 @@
 @using Web.Dialogs
 @inject NovelService _novelService;
 @inject IDialogService _dialogService
-@inject NavigationManager _navigationManager
 <PageTitle>Novels</PageTitle>
 
-
 <MudButton OnClick="OpenAddNovelDialog">Add Novel</MudButton>
-<MudTable T="Novel" RowClass="cursor-pointer" Items="@novels" Hover="true" Breakpoint="Breakpoint.Sm" @ref="novelsTable" OnRowClick="OnNovelRowClick">
+<MudTable T="Novel" RowClass="cursor-pointer" Items="@_novels" Hover="true" Breakpoint="Breakpoint.Sm" @ref="_novelsTable" OnRowClick="OnNovelRowClick">
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Owner</MudTh>
@@ -24,13 +22,13 @@
 
 @code{
 
-    private MudTable<Novel>? novelsTable;
+    private MudTable<Novel>? _novelsTable;
 
-    Novel[] novels = Array.Empty<Novel>();
+    Novel[] _novels = Array.Empty<Novel>();
 
     protected override async Task OnInitializedAsync()
     {
-        novels = await _novelService.GetAllNovels();
+        _novels = await _novelService.GetAllNovels();
     }
 
     private void OpenAddNovelDialog()

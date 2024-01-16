@@ -1,12 +1,13 @@
 ﻿@using Web.Models
 @using Web.Services
+@using Web.Enums
 @inject CharacterNameService CharacterNameService
 @inject IDialogService DialogService
 
-<MudButton OnClick="Back">Back</MudButton>
+<MudButton OnClick="@Back">Back</MudButton>
 <MudDialog>
     <DialogContent>
-        <MudTable Items="@_characterNames" @bind-SelectedItem="_selectedItem1" Hover="true" Breakpoint="Breakpoint.Sm" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" RowEditCommit="ItemHasBeenCommitted">
+        <MudTable Items="@_characterNames" @bind-SelectedItem="_selectedItem" Hover="true" Breakpoint="Breakpoint.Sm" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" RowEditCommit="WhenItemUpdated">
             <HeaderContent>
                 <MudTh>EnglishName</MudTh>
                 <MudTh>ArabicName</MudTh>
@@ -17,6 +18,7 @@
                 <MudTd DataLabel="ArabicName">@context.arabicName</MudTd>
                 <MudTd DataLabel="Gender">@context.gender</MudTd>
                 <MudTd Class="invisible" DataLabel="Id">@context.Id</MudTd>
+                <MudButton OnClick="@(()=> RemoveCharacterName(context))">Remove</MudButton>
             </RowTemplate>
             <RowEditingTemplate>
                 <MudTd DataLabel="englishName">
@@ -28,13 +30,12 @@
                 <MudTd DataLabel="gender">
                     <MudTextField @bind-Value="@context.gender" Required/>
                 </MudTd>
-                @*<MudTd DataLabel="id">@context.Id</MudTd>*@
             </RowEditingTemplate>
         </MudTable>
     </DialogContent>
 </MudDialog>
 
-@code {
+ @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public int NovelId { get; set; }
@@ -44,8 +45,8 @@
         MudDialog.Cancel();
     }
 
-    private CharacterName _selectedItem1 = null!;
-    CharacterName[]? _characterNames;
+    private CharacterName _selectedItem = null!;
+    List<CharacterName>? _characterNames;
     private CharacterName? _characterNameBeforeEdit;
 
 
@@ -60,8 +61,10 @@
         {
             englishName = ((CharacterName)element).englishName,
             arabicName = ((CharacterName)element).arabicName,
-            gender = ((CharacterName)element).gender
+            gender = ((CharacterName)element).gender,
+            Id = ((CharacterName)element).Id,
         };
+
         StateHasChanged();
     }
 
@@ -73,15 +76,51 @@
         StateHasChanged();
     }
 
-    private async void ItemHasBeenCommitted(object element)
+    private async void WhenItemUpdated(object element)
     {
         var characterName = element as CharacterName;
 
         if (characterName is null)
             return;
-        
+
+        //Check If Item Not Updated
+        if (characterName == _characterNameBeforeEdit)
+        {
+            return; // return to dont send any requests to server
+        }
+
         //Call Update API
-        await CharacterNameService.UpdateEntityNameById(characterName);
+        var result = await CharacterNameService.UpdateEntityNameById(characterName);
+
+        await ShowMasseageBoxForResult(result);
     }
-    
+
+    private async Task RemoveCharacterName(CharacterName item)
+    {
+        //Remove From Database
+        var result = await CharacterNameService.RemoveEntityNameById(item.Id);
+
+        await ShowMasseageBoxForResult(result);
+
+        //Remove From Table
+        _characterNames?.Remove(item);
+    }
+
+    private async Task ShowMasseageBoxForResult(EEntityNameResult result)
+    {
+        switch (result)
+        {
+            case EEntityNameResult.Success:
+                break;
+            case EEntityNameResult.NoPermission:
+                await DialogService.ShowMessageBox("No Permission", "You Dont Have Permission For This Action");
+                break;
+            case EEntityNameResult.AuthRequired:
+                await DialogService.ShowMessageBox("Auth Required", "Please Login First");
+                break;
+            case EEntityNameResult.ServerError:
+                await DialogService.ShowMessageBox("Error", "Failed To Connect To Server, Please Report");
+                break;
+        }
+    }
 }

@@ -1,6 +1,6 @@
 ﻿namespace Web.Models;
 
-public class CharacterName
+public record CharacterName
 {
     public int Id { get; set; }
     public required string englishName { get; set; }
