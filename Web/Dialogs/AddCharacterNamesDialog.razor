@@ -106,7 +106,10 @@
     async Task ExtractCharacterNamesFromTextByAi()
     {
         //Open Text Dialog
-        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var options = new DialogOptions
+        {
+            CloseOnEscapeKey = true
+        };
         var dialog = await DialogService.ShowAsync<TextBoxDialog>("Enter Novel Text", options);
         
         var dialogResult = await dialog.Result;

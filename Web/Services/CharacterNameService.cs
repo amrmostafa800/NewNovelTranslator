@@ -83,8 +83,9 @@ public class CharacterNameService
         try
         {
             var response = await _client.PutAsJsonAsync($"api/EntityName/{characterName.Id}",json)!;
-            
-            if (await response.Content.ReadAsStringAsync() == "Edited")
+            var responseResult = await response.Content.ReadAsStringAsync();
+
+            if (responseResult.Contains("Edited"))
             {
                 return EEntityNameResult.Success;
             }

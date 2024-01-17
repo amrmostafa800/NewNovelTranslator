@@ -21,13 +21,15 @@ public class NovelService
         try
         {
             var novels = await _client.GetFromJsonAsync<Novel[]>("api/Novel")!;
-            if (novels != null) return novels;
+            
+            if (novels != null)
+                return novels;
+            
             return Array.Empty<Novel>();
         }
         catch (Exception ex)
         {
-            // Log or handle the exception appropriately
-            Console.WriteLine($"Error fetching novels: {ex.Message}");
+            Console.WriteLine($"Error : {ex.Message}");
             return Array.Empty<Novel>();
         }
     }
@@ -47,9 +49,13 @@ public class NovelService
         request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
         var response = await _client.SendAsync(request);
+        
         if (response.IsSuccessStatusCode)
             return EaddNovelResult.Success;
-        if (response.StatusCode == HttpStatusCode.Unauthorized) return EaddNovelResult.AuthRequired;
+        
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+            return EaddNovelResult.AuthRequired;
+        
         return EaddNovelResult.ServerError;
     }
 
@@ -65,8 +71,7 @@ public class NovelService
             var response = await _client.PostAsJsonAsync($"api/Translate/{novelId}",json)!;
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                return responseContent;
+                return await response.Content.ReadAsStringAsync();
             }
         }
         catch (Exception ex)

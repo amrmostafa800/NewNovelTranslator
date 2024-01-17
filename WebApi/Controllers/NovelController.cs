@@ -15,12 +15,12 @@ public class
     NovelController : ControllerBase //TDO use DataProtectionProvider to create protector to encrypt ID - Try make code more clean
 {
     private readonly NovelService _novelService;
-    private readonly IValidator<CreateNovelDto> _NovelValidator;
+    private readonly IValidator<CreateNovelDto> _novelValidator;
 
     public NovelController(NovelService novelService, IValidator<CreateNovelDto> createNovelValidator)
     {
         _novelService = novelService;
-        _NovelValidator = createNovelValidator;
+        _novelValidator = createNovelValidator;
     }
 
     // GET: api/<NovelController>
@@ -35,12 +35,21 @@ public class
     public IActionResult Get(int id)
     {
         var novel = _novelService.GetById(id);
+
         if (novel == null)
-            return new ErrorResponse
+        {
+            return new BadRequestResponse
             {
                 Description = "Novel Id Not Exist"
             };
-        return Ok(novel);
+        }
+        
+        return Ok(new
+        {
+            novel.Id,
+            novel.Name,
+            OwnerUserId = novel.UserId,
+        });
     }
 
     // POST api/<NovelController>
@@ -48,19 +57,29 @@ public class
     [Authorize]
     public async Task<IActionResult> Create([FromBody] CreateNovelDto novelDto)
     {
-        var validationResult = await _NovelValidator.ValidateAsync(novelDto);
+        var validationResult = await _novelValidator.ValidateAsync(novelDto);
 
-        if (!validationResult.IsValid) return BadRequest(validationResult.Errors);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
 
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
 
         var novelUserId = await _novelService.AddNovel(novelDto.NovelName, userId);
+        
         if (novelUserId == 0)
-            return new ErrorResponse
+        {
+            return new BadRequestResponse
             {
                 Description = "You Already Own Novel With Same Name"
             };
-        return Ok("Created");
+        }
+
+        return new OkResponse
+        {
+            Description = "Created"
+        };
     }
 
     // DELETE api/<NovelController>/5
@@ -71,24 +90,35 @@ public class
         var novel = _novelService.GetById(id);
 
         if (novel == null) // check if novel not exist
-            return new ErrorResponse
+        {
+            return new BadRequestResponse
             {
                 Description = "No Novel With This Id"
             };
+        }
 
         if (novel.UserId != _GetCurrentUserId()) //check if current User Have Permission To Delete This Novel
-            return new ErrorResponse
+        {
+            return new BadRequestResponse
             {
                 Description = "You Cant Delete Novel Without Have Permission On It"
             };
+        }
 
         var isDeleted = await _novelService.DeleteNovel(id);
+        
         if (!isDeleted)
-            return new ErrorResponse
+        {
+            return new BadRequestResponse
             {
                 Description = "Unknown Error"
             };
-        return Ok("Deleted");
+        }
+        
+        return new OkResponse
+        {
+            Description = "Deleted"
+        };
     }
 
     [HttpPost("AddNovelUser")]
@@ -96,31 +126,62 @@ public class
     public async Task<IActionResult> AddNovelUser([FromBody] AddNovelUserDto addNovelUser)
     {
         if (string.IsNullOrEmpty(addNovelUser.UserName))
-            return new ErrorResponse
+        {
+            return new BadRequestResponse
             {
                 Description = "UserName Cannot Been Null Or Empty"
             };
+        }
 
         //Check If CurrentUser Have Permmion To Novel
         var novel = _novelService.GetById(addNovelUser.NovelId);
 
         if (novel == null) // check if novel not exist
-            return new ErrorResponse
+        {
+            return new BadRequestResponse
             {
                 Description = "No Novel With This Id"
             };
+        }
 
         if (novel.UserId != _GetCurrentUserId()) //check if current User Have Permission To Delete This Novel
-            return new ErrorResponse
+        {
+            return new BadRequestResponse
             {
                 Description = "You Cant Delete Novel Without Have Permission On It"
             };
+        }
 
-        if (await _novelService.AddNovelUser(addNovelUser.NovelId, addNovelUser.UserName)) return Ok("Added");
+        if (await _novelService.AddNovelUser(addNovelUser.NovelId, addNovelUser.UserName))
+        {
+            return new OkResponse
+            {
+                Description = "Added"
+            };
+        }
 
-        return new ErrorResponse
+        return new BadRequestResponse
         {
             Description = "You Already Have Permission On This Novel"
+        };
+    }
+
+    [HttpPost("CheckIfOwnPermissionOnNovel")]
+    public async Task<IActionResult> CheckIfOwnPermissionOnNovel(CheckForPermissionDto checkForPermission)
+    {
+        var result = await _novelService.IsUserOwnThisNovel(checkForPermission.NovelId, checkForPermission.UserId);
+        
+        if (result)
+        {
+            return new OkResponse
+            {
+                Description = "true"
+            };
+        }
+
+        return new OkResponse()
+        {
+            Description = "False"
         };
     }
 

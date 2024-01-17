@@ -15,8 +15,13 @@ public class EntityNameService
         _context = context;
     }
 
-    public List<EntityName> GetEntityNamesByNovelId(int novelId)
+    public List<EntityName> GetEntityNamesByNovelId(int novelId,bool orderByLengthDescending = false)
     {
+        if (!orderByLengthDescending)
+        {
+            return _context.EntityNames.Where(n => n.NovelId == novelId).ToList();
+        }
+        
         return _context.EntityNames.Where(n => n.NovelId == novelId).OrderByDescending(n => n.EnglishName.Length).ToList();
     }
 
@@ -39,10 +44,14 @@ public class EntityNameService
             Gender = e.Gender,
             NovelId = entityNameDto.NovelId
         }).ToList();
+        
         var entityNames = await Task.WhenAll(entityNamesTask);
 
         _context.EntityNames.AddRange(entityNames);
-        if (await _context.SaveChangesAsync() != 0) return true;
+        
+        if (await _context.SaveChangesAsync() != 0)
+            return true;
+        
         return false; // failed
     }
 
@@ -67,7 +76,10 @@ public class EntityNameService
     public async Task<bool> UpdateEntityName(int id, string newEnglishName,string newArabicName, char gender)
     {
         var entityName = _context.EntityNames.FirstOrDefault(n => n.Id == id);
-        if (entityName == null) return false;
+        
+        if (entityName == null) 
+            return false;
+        
         entityName.EnglishName = newEnglishName;
         entityName.Gender = gender;
         //entityName.ArabicName = await TextTranslator.Instance.SendRequestAsync(newEnglishName);
@@ -75,6 +87,7 @@ public class EntityNameService
 
         _context.EntityNames.Update(entityName);
         await _context.SaveChangesAsync();
+        
         return true;
     }
 
@@ -83,9 +96,7 @@ public class EntityNameService
         return _context.EntityNames.Where(e => e.Id == entityNameId).ExecuteDelete() != 0;
     }
 
-    public bool
-        CheckIfNovelUserIdsOfThisEntityNameEqualThisNovelUserId(int entityNameId,
-            int currentAuthUserId) // i do it with this why bycouse novel can have more than 1 user
+    public bool CheckIfNovelUserIdsOfThisEntityNameEqualThisNovelUserId(int entityNameId, int currentAuthUserId) // note : novel can have more than 1 user but i dont add this to FrontEnd
     {
         var query = from entityName in _context.EntityNames
             join novelUser in _context.NovelUsers on entityName.NovelId equals novelUser.NovelId

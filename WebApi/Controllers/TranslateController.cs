@@ -21,13 +21,17 @@ public class TranslateController : ControllerBase
     [HttpPost("{novelId}")]
     public async Task<IActionResult> Translate(int novelId, [FromBody] TranslateDto data)
     {
-        var entityNamesOfThisNovel = _entityNameService.GetEntityNamesByNovelId(novelId);
+        var entityNamesOfThisNovel = _entityNameService.GetEntityNamesByNovelId(novelId,true);
 
-        if (entityNamesOfThisNovel.IsNullOrEmpty()) return BadRequest("Novel Id Not Exist");
+        if (entityNamesOfThisNovel.IsNullOrEmpty())
+        {
+            return BadRequest("Novel Id Not Exist");
+        }
 
         var entityNamesOfThisNovelAsNovelTextProcessor = EntityNameMapper
             .ConvertFromModelEntityNameArrayToNovelTextProcessorEntityNameArray(entityNamesOfThisNovel.ToArray())
             .ToArray();
+        
         var processor = new Processor(data.Text, entityNamesOfThisNovelAsNovelTextProcessor);
         await processor.RunAsync();
         return Ok(processor.GetResult());

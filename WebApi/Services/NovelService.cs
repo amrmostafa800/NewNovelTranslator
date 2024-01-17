@@ -123,9 +123,9 @@ public class NovelService
         return true;
     }
 
-    public async Task<bool> IsUserOwnThisNovel(int novelId, int UserId)
+    public async Task<bool> IsUserOwnThisNovel(int novelId, int userId)
     {
-        var novel = await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelId == novelId && n.UserId == UserId);
+        var novel = await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelId == novelId && n.UserId == userId);
         return novel != null;
     }
 }
