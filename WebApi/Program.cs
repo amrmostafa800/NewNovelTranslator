@@ -20,7 +20,8 @@ public class Program
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
         
-        var corsWebsiteUrl = builder.Configuration.GetValue<string>("CORS:WebsiteUrl") ?? throw new InvalidOperationException("CORS 'WebsiteUrl' not found.");
+        var websiteUrl = builder.Configuration.GetValue<string>("Settings:WebsiteUrl") ?? throw new InvalidOperationException("CORS 'WebsiteUrl' not found.");
+        var apiUrl = builder.Configuration.GetValue<string>("Settings:ApiUrl") ?? throw new InvalidOperationException("CORS 'WebsiteUrl' not found.");
 
         builder.Services.AddIdentityApiEndpoints<CustomIdentityUser>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -30,7 +31,7 @@ public class Program
         builder.Services.ConfigureApplicationCookie(options =>
         {
             options.Cookie.SameSite = SameSiteMode.None;
-            //options.Cookie.Domain = ""; // need to set later maybe
+            //options.Cookie.Domain = apiUrl.Replace("https://","").Replace("http://","");
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.HttpOnly = true;
         });
@@ -48,7 +49,7 @@ public class Program
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+        //// Configure the HTTP request pipeline.
         //if (app.Environment.IsDevelopment())
         //{
         app.UseSwagger();
@@ -62,7 +63,7 @@ public class Program
         app.UseCors(x => x
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .SetIsOriginAllowed(origin => origin == corsWebsiteUrl)
+            .SetIsOriginAllowed(origin => origin == websiteUrl)
             .AllowCredentials()
         );
         app.UseAuthorization();

@@ -41,14 +41,7 @@ public class NovelService
             novelName
         };
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5000/api/Novel");
-
-        request.Headers.Add("accept", "*/*");
-
-        request.Content = new StringContent(JObject.FromObject(addNovel).ToString());
-        request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-        var response = await _client.SendAsync(request);
+        var response = await _client.PostAsJsonAsync("api/Novel",addNovel)!;
         
         if (response.IsSuccessStatusCode)
             return EaddNovelResult.Success;
