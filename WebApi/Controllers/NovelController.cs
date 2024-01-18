@@ -5,22 +5,23 @@ using Microsoft.AspNetCore.Mvc;
 using WebApi.DTOs;
 using WebApi.Responses;
 using WebApi.Services;
-using WebApp.Extensions;
+using WebApi.Extensions;
 
 namespace WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class
-    NovelController : ControllerBase //TDO use DataProtectionProvider to create protector to encrypt ID - Try make code more clean
+public class NovelController : ControllerBase //TDO use DataProtectionProvider to create protector to encrypt ID - Try make code more clean
 {
     private readonly NovelService _novelService;
+    private readonly NovelSharedService _novelSharedService;
     private readonly IValidator<CreateNovelDto> _novelValidator;
 
-    public NovelController(NovelService novelService, IValidator<CreateNovelDto> createNovelValidator)
+    public NovelController(NovelService novelService, IValidator<CreateNovelDto> createNovelValidator, NovelSharedService novelSharedService)
     {
         _novelService = novelService;
         _novelValidator = createNovelValidator;
+        _novelSharedService = novelSharedService;
     }
 
     // GET: api/<NovelController>
@@ -97,7 +98,7 @@ public class
             };
         }
 
-        if (novel.UserId != _GetCurrentUserId()) //check if current User Have Permission To Delete This Novel (Only Owner Can Delete Novel (first NovelUser is the Owner and is who create the novel))
+        if (novel.UserId != User.GetCurrentUserId()) //check if current User Have Permission To Delete This Novel (Only Owner Can Delete Novel (first NovelUser is the Owner and is who create the novel))
         {
             return new BadRequestResponse
             {
@@ -121,55 +122,10 @@ public class
         };
     }
 
-    [HttpPost("AddNovelUser")]
-    [Authorize]
-    public async Task<IActionResult> AddNovelUser([FromBody] AddNovelUserDto addNovelUser)
-    {
-        if (string.IsNullOrEmpty(addNovelUser.UserName))
-        {
-            return new BadRequestResponse
-            {
-                Description = "UserName Cannot Been Null Or Empty"
-            };
-        }
-
-        //Check If CurrentUser Have Permission To Novel
-        var novel = _novelService.GetById(addNovelUser.NovelId);
-
-        if (novel == null) // check if novel not exist
-        {
-            return new BadRequestResponse
-            {
-                Description = "No Novel With This Id"
-            };
-        }
-
-        if (novel.UserId != _GetCurrentUserId()) //check if current User Have Permission To Delete This Novel
-        {
-            return new BadRequestResponse
-            {
-                Description = "You Cant Add Novel User If You Not Owner Of It"
-            };
-        }
-
-        if (await _novelService.AddNovelUser(addNovelUser.NovelId, addNovelUser.UserName))
-        {
-            return new OkResponse
-            {
-                Description = "Added"
-            };
-        }
-
-        return new BadRequestResponse
-        {
-            Description = "You Already Have Permission On This Novel"
-        };
-    }
-
     [HttpPost("CheckIfOwnPermissionOnNovel")]
     public async Task<IActionResult> CheckIfOwnPermissionOnNovel(CheckForPermissionDto checkForPermission)
     {
-        var result = await _novelService.IsUserOwnThisNovel(checkForPermission.NovelId, checkForPermission.UserId);
+        var result = await _novelSharedService.IsUserOwnThisNovel(checkForPermission.NovelId, checkForPermission.UserId);
         
         if (result)
         {
@@ -183,10 +139,5 @@ public class
         {
             Description = "False"
         };
-    }
-
-    private int _GetCurrentUserId()
-    {
-        return User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
     }
 }

@@ -43,6 +43,8 @@ public class Program
         builder.Services.AddSwaggerGen();
 
         builder.Services.AddScoped<NovelService>();
+        builder.Services.AddScoped<NovelUserService>();
+        builder.Services.AddScoped<NovelSharedService>();
         builder.Services.AddScoped<EntityNameService>();
         builder.Services.AddScoped<IValidator<CreateNovelDto>, NovelValidator>();
         builder.Services.AddScoped<IValidator<EntityNameDto>, EntityNameValidator>();

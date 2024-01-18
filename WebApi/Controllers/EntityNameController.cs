@@ -6,7 +6,7 @@ using NovelTextProcessor;
 using WebApi.DTOs;
 using WebApi.Responses;
 using WebApi.Services;
-using WebApp.Extensions;
+using WebApi.Extensions;
 
 namespace WebApi.Controllers;
 

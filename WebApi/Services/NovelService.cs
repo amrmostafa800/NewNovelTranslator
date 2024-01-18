@@ -8,10 +8,12 @@ namespace WebApi.Services;
 public class NovelService
 {
     private readonly ApplicationDbContext _context;
+    private readonly NovelUserService _novelUserService;
 
-    public NovelService(ApplicationDbContext context)
+    public NovelService(ApplicationDbContext context, NovelUserService novelUserService)
     {
         _context = context;
+        _novelUserService = novelUserService;
     }
 
     public List<NovelDto> GetAllNovels()
@@ -34,19 +36,6 @@ public class NovelService
             UserName = n.User!.UserName!,
             Name = n.Novel!.NovelName!
         }).FirstOrDefault();
-    }
-
-    private async Task<bool> _AddNovelUser(int novelId, int userId)
-    {
-        var novelUser = new NovelUser
-        {
-            NovelId = novelId,
-            UserId = userId
-        };
-
-        await _context.NovelUsers.AddAsync(novelUser);
-
-        return await _context.SaveChangesAsync() != 0; // check if Added Successfully
     }
 
     private async Task<Novel> _AddNovel(string novelName)
@@ -73,7 +62,6 @@ public class NovelService
         return false;
     }
 
-    // i make add novel in 2 table to Allow Create Same Novel By Deffrant Users and Allow more than one User Acsses to Edit This Novel Or Add Entity Names To It without repeat novel name
     public async Task<int> AddNovel(string novelName, int userIdWhoCreateNovel)
     {
 
@@ -86,17 +74,8 @@ public class NovelService
         var novel = await _AddNovel(novelName);
 
         //Add NovelUser
-        await _AddNovelUser(novel.Id, userIdWhoCreateNovel);
+        await _novelUserService.AddNovelUser(novel.Id, userIdWhoCreateNovel);
         return novel.Id;
-    }
-
-    public async Task<bool> AddNovelUser(int novelId, string username)
-    {
-        var userId = await _context.Users.Where(u => u.UserName == username).Select(u => u.Id).FirstOrDefaultAsync();
-
-        if (await IsUserOwnThisNovel(novelId, userId)) return false; // user already in this novel
-
-        return await _AddNovelUser(novelId, userId);
     }
 
     public async Task<bool> DeleteNovel(int id)
@@ -110,11 +89,5 @@ public class NovelService
         _context.Novels.Remove(novel); // Bycouse Cascade Delete Enabled Remove Novel Will Remove NovelUsers Too
         await _context.SaveChangesAsync();
         return true;
-    }
-
-    public async Task<bool> IsUserOwnThisNovel(int novelId, int userId)
-    {
-        var novel = await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelId == novelId && n.UserId == userId);
-        return novel != null;
     }
 }

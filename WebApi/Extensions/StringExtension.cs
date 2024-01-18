@@ -1,4 +1,4 @@
-﻿namespace WebApp.Extensions;
+﻿namespace WebApi.Extensions;
 
 public static class StringExtension
 {
