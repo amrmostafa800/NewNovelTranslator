@@ -133,7 +133,7 @@ public class
             };
         }
 
-        //Check If CurrentUser Have Permmion To Novel
+        //Check If CurrentUser Have Permission To Novel
         var novel = _novelService.GetById(addNovelUser.NovelId);
 
         if (novel == null) // check if novel not exist
@@ -148,7 +148,7 @@ public class
         {
             return new BadRequestResponse
             {
-                Description = "You Cant Delete Novel Without Have Permission On It"
+                Description = "You Cant Add Novel User If You Not Owner Of It"
             };
         }
 

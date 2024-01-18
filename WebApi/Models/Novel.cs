@@ -1,9 +1,12 @@
-﻿namespace WebApi.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WebApi.Models;
 
 public class Novel
 {
     public int Id { get; set; }
-    public int NovelNameId { get; set; }
-
-    public NovelName? NovelName { get; set; }
-}
+    
+    [Column(TypeName = "VARCHAR")]
+    [MaxLength(256)]
+    public required string NovelName { get; set; } }
