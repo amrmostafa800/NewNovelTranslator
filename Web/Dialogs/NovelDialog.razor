@@ -6,6 +6,10 @@
         <MudButton OnClick="@OpenShowCharacterNamesDialog" Variant="Variant.Filled">Show Character Names</MudButton>
         <MudButton OnClick="@OpenAddCharacterNamesDialog" Variant="Variant.Filled">Add Character Names</MudButton>
         <MudButton OnClick="@OpenNovelTranslatorDialog" Variant="Variant.Filled">Translator</MudButton>
+        @if (IsDialogOpenedByOwner)
+        {
+            <MudButton OnClick="@OpenNovelUsersManagementDialog" Variant="Variant.Filled">Users Management</MudButton>
+        }
     </DialogContent>
 </MudDialog>
 
@@ -13,6 +17,7 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public int NovelId { get; set; }
+    [Parameter] public bool IsDialogOpenedByOwner { get; set; }
 
     void Back()
     {
@@ -57,4 +62,18 @@
 
         DialogService.Show<NovelTranslatorDialog>("Translator", parameters, option);
     }
+
+    private void OpenNovelUsersManagementDialog()
+    {
+        var parameters = new DialogParameters<NovelUsersManagementDialog>();
+        parameters.Add(p => p.NovelId, NovelId);
+
+        var option = new DialogOptions
+        {
+            FullScreen = true
+        };
+
+        DialogService.Show<NovelUsersManagementDialog>("Users Management", parameters, option);
+    }
+
 }

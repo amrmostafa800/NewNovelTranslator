@@ -16,21 +16,21 @@ public class NovelService
         _client = client;
     }
 
-    public async Task<Novel[]> GetAllNovels()
+    public async Task<NovelDto[]> GetAllNovels()
     {
         try
         {
-            var novels = await _client.GetFromJsonAsync<Novel[]>("api/Novel")!;
+            var novels = await _client.GetFromJsonAsync<NovelDto[]>("api/Novel")!;
             
             if (novels != null)
                 return novels;
             
-            return Array.Empty<Novel>();
+            return Array.Empty<NovelDto>();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error : {ex.Message}");
-            return Array.Empty<Novel>();
+            return Array.Empty<NovelDto>();
         }
     }
 

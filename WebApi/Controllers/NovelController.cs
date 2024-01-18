@@ -97,11 +97,11 @@ public class
             };
         }
 
-        if (novel.UserId != _GetCurrentUserId()) //check if current User Have Permission To Delete This Novel
+        if (novel.UserId != _GetCurrentUserId()) //check if current User Have Permission To Delete This Novel (Only Owner Can Delete Novel (first NovelUser is the Owner and is who create the novel))
         {
             return new BadRequestResponse
             {
-                Description = "You Cant Delete Novel Without Have Permission On It"
+                Description = "You Cant Delete Novel Not Created By You"
             };
         }
 

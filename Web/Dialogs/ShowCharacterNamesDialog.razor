@@ -45,9 +45,9 @@
         MudDialog.Cancel();
     }
 
-    private CharacterName _selectedItem = null!;
-    List<CharacterName>? _characterNames;
-    private CharacterName? _characterNameBeforeEdit;
+    private CharacterNameDto _selectedItem = null!;
+    List<CharacterNameDto>? _characterNames;
+    private CharacterNameDto? _characterNameBeforeEdit;
 
 
     protected override async Task OnInitializedAsync()
@@ -57,12 +57,12 @@
 
     private void BackupItem(object element)
     {
-        _characterNameBeforeEdit = new CharacterName
+        _characterNameBeforeEdit = new CharacterNameDto
         {
-            englishName = ((CharacterName)element).englishName,
-            arabicName = ((CharacterName)element).arabicName,
-            gender = ((CharacterName)element).gender,
-            Id = ((CharacterName)element).Id,
+            englishName = ((CharacterNameDto)element).englishName,
+            arabicName = ((CharacterNameDto)element).arabicName,
+            gender = ((CharacterNameDto)element).gender,
+            Id = ((CharacterNameDto)element).Id,
         };
 
         StateHasChanged();
@@ -70,15 +70,15 @@
 
     private void ResetItemToOriginalValues(object element)
     {
-        ((CharacterName)element).englishName = _characterNameBeforeEdit!.englishName;
-        ((CharacterName)element).arabicName = _characterNameBeforeEdit!.arabicName;
-        ((CharacterName)element).gender = _characterNameBeforeEdit!.gender;
+        ((CharacterNameDto)element).englishName = _characterNameBeforeEdit!.englishName;
+        ((CharacterNameDto)element).arabicName = _characterNameBeforeEdit!.arabicName;
+        ((CharacterNameDto)element).gender = _characterNameBeforeEdit!.gender;
         StateHasChanged();
     }
 
     private async void WhenItemUpdated(object element)
     {
-        var characterName = element as CharacterName;
+        var characterName = element as CharacterNameDto;
 
         if (characterName is null)
             return;
@@ -95,7 +95,7 @@
         await ShowMasseageBoxForResult(result);
     }
 
-    private async Task RemoveCharacterName(CharacterName item)
+    private async Task RemoveCharacterName(CharacterNameDto item)
     {
         //Remove From Database
         var result = await CharacterNameService.RemoveEntityNameById(item.Id);

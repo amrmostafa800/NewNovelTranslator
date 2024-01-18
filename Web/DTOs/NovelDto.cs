@@ -1,6 +1,6 @@
 ﻿namespace Web.Models;
 
-public class Novel
+public class NovelDto
 {
     public int Id { get; set; }
     public int UserId { get; set; }

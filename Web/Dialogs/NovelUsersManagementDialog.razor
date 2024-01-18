@@ -1,0 +1,16 @@
+﻿@using Web.Services
+@inject NovelService NovelService
+<MudDialog>
+    <DialogContent>
+        <MudButton FullWidth="true" OnClick="@Back">Back</MudButton>
+        
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    
+    [Parameter] public int NovelId { get; set; }
+    
+    void Back() => MudDialog.Cancel();
+}

@@ -2,12 +2,13 @@
 @using Web.Models
 @using Web.Services
 @using Web.Dialogs
-@inject NovelService _novelService;
-@inject IDialogService _dialogService
+@inject NovelService NovelService;
+@inject IDialogService DialogService
+@inject UserService UserService
 <PageTitle>Novels</PageTitle>
 
-<MudButton OnClick="OpenAddNovelDialog">Add Novel</MudButton>
-<MudTable T="Novel" RowClass="cursor-pointer" Items="@_novels" Hover="true" Breakpoint="Breakpoint.Sm" @ref="_novelsTable" OnRowClick="OnNovelRowClick">
+<MudButton OnClick="@OpenAddNovelDialog">Add Novel</MudButton>
+<MudTable T="NovelDto" RowClass="cursor-pointer" Items="@_novels" Hover="true" Breakpoint="Breakpoint.Sm" @ref="_novelsTable" OnRowClick="OnNovelRowClick">
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Owner</MudTh>
@@ -22,13 +23,18 @@
 
 @code{
 
-    private MudTable<Novel>? _novelsTable;
+    private MudTable<NovelDto>? _novelsTable;
 
-    Novel[] _novels = Array.Empty<Novel>();
+    NovelDto[] _novels = Array.Empty<NovelDto>();
 
     protected override async Task OnInitializedAsync()
     {
-        _novels = await _novelService.GetAllNovels();
+        _novels = await NovelService.GetAllNovels();
+
+        if (UserService.CurrentUsername == String.Empty)
+        {
+            UserService.CurrentUsername = await UserService.GetCurrentEmail();
+        }
     }
 
     private void OpenAddNovelDialog()
@@ -37,10 +43,10 @@
         {
             CloseOnEscapeKey = true
         };
-        _dialogService.Show<AddNovelDialog>("Add Novel", options);
+        DialogService.Show<AddNovelDialog>("Add Novel", options);
     }
 
-    private void OnNovelRowClick(TableRowClickEventArgs<Novel> novelRowEventArgs)
+    private void OnNovelRowClick(TableRowClickEventArgs<NovelDto> novelRowEventArgs)
     {
         //await _dialogService.ShowMessageBox("test", tableRowClickEventArgs.Item.Name);
         //TDO Use _navigationManager to go to novel page (still not create novel page)
@@ -52,8 +58,14 @@
 
         var dialogParam = new DialogParameters<NovelDialog>();
         dialogParam.Add(n => n.NovelId, novelRowEventArgs.Item.Id);
+        dialogParam.Add(n => n.IsDialogOpenedByOwner, IsOwnerOfNovel(novelRowEventArgs.Item.UserName));
 
-        _dialogService.Show<NovelDialog>(novelRowEventArgs.Item.Name, dialogParam, options);
+        DialogService.Show<NovelDialog>(novelRowEventArgs.Item.Name, dialogParam, options);
     }
 
+    private bool IsOwnerOfNovel(string username)
+    {
+        return UserService.CurrentUsername == username;
+    }
+    
 }

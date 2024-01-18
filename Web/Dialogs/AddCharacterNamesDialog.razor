@@ -10,7 +10,7 @@
         <MudButton FullWidth="true" OnClick="@Back">Back</MudButton>
         <MudButton OnClick="@AddCharacterName" Color="@Color.Success" Class="add-item-btn">Add Character Name</MudButton>
         <MudButton OnClick="@ExtractCharacterNamesFromTextByAi" Color="@Color.Default" Class="add-item-btn">Extract Character Names By AI</MudButton>
-        <MudDataGrid T="AddCharacterName" Items="@_characterNames" ReadOnly="false" EditMode="@DataGridEditMode.Cell"
+        <MudDataGrid T="AddCharacterNameDto" Items="@_characterNames" ReadOnly="false" EditMode="@DataGridEditMode.Cell"
                      Bordered="true" Dense="true" EditTrigger="@DataGridEditTrigger.OnRowClick">
             <Columns>
                 <PropertyColumn Property="x => x.englishName"> </PropertyColumn>
@@ -38,7 +38,7 @@
 
     [Parameter] public int NovelId { get; set; }
 
-    List<AddCharacterName>? _characterNames;
+    List<AddCharacterNameDto>? _characterNames;
 
     void Back()
     {
@@ -78,26 +78,26 @@
 
     protected override void OnInitialized()
     {
-        _characterNames = new List<AddCharacterName>();
+        _characterNames = new List<AddCharacterNameDto>();
     }
 
     void AddCharacterName()
     {
-        _characterNames?.Add(new AddCharacterName()
+        _characterNames?.Add(new AddCharacterNameDto()
         {
             englishName = "",
             gender = 'M',
         });
     }
     
-    void RemoveCharacterName(AddCharacterName item)
+    void RemoveCharacterName(AddCharacterNameDto item)
     {
         _characterNames?.Remove(item);
     }
     
     void AddCharacterName(string englishName)
     {
-        _characterNames?.Add(new AddCharacterName()
+        _characterNames?.Add(new AddCharacterNameDto()
         {
             englishName = englishName,
         });

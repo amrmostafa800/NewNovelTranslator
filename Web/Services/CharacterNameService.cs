@@ -15,7 +15,7 @@ public class CharacterNameService
         _client = client;
     }
 
-    public async Task<EEntityNameResult> AddEntityNamesByNovelId(List<AddCharacterName> characterNames,int novelId)
+    public async Task<EEntityNameResult> AddEntityNamesByNovelId(List<AddCharacterNameDto> characterNames,int novelId)
     {
         var json = new
         {
@@ -71,18 +71,18 @@ public class CharacterNameService
         return EEntityNameResult.AuthRequired;
     }
     
-    public async Task<EEntityNameResult> UpdateEntityNameById(CharacterName characterName)
+    public async Task<EEntityNameResult> UpdateEntityNameById(CharacterNameDto characterNameDto)
     {
         var json = new
         {
-            characterName.englishName,
-            characterName.gender,
-            characterName.arabicName
+            characterNameDto.englishName,
+            characterNameDto.gender,
+            characterNameDto.arabicName
         };
         
         try
         {
-            var response = await _client.PutAsJsonAsync($"api/EntityName/{characterName.Id}",json)!;
+            var response = await _client.PutAsJsonAsync($"api/EntityName/{characterNameDto.Id}",json)!;
             var responseResult = await response.Content.ReadAsStringAsync();
 
             if (responseResult.Contains("Edited"))
@@ -99,21 +99,21 @@ public class CharacterNameService
         return EEntityNameResult.NoPermission;
     }
     
-    public async Task<List<CharacterName>> GetAllEntityNamesByNovelId(int novelId)
+    public async Task<List<CharacterNameDto>> GetAllEntityNamesByNovelId(int novelId)
     {
         try
         {
-            var novels = await _client.GetFromJsonAsync<CharacterName[]>($"api/EntityName/{novelId}")!;
+            var novels = await _client.GetFromJsonAsync<CharacterNameDto[]>($"api/EntityName/{novelId}")!;
             
             if (novels != null) 
                 return novels.ToList();
 
-            return new List<CharacterName>();
+            return new List<CharacterNameDto>();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error : {ex.Message}");
-            return new List<CharacterName>();
+            return new List<CharacterNameDto>();
         }
     }
 
