@@ -11,7 +11,7 @@ public class UserService
         _client = client;
     }
 
-    public event EventHandler? OnLogin;
+    public event Action<string>? OnLogin;
     public event EventHandler? OnLogout;
 
     public async Task<bool> Register(string email, string password)
@@ -39,7 +39,7 @@ public class UserService
         var coockies = response.Headers.Where(h => h.Key == "Cookie");
         if (response.IsSuccessStatusCode)
         {
-            OnLogin?.Invoke(this, EventArgs.Empty);
+            OnLogin?.Invoke(email);
             return true;
         }
 

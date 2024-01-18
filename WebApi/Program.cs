@@ -19,6 +19,8 @@ public class Program
                                throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
+        
+        var corsWebsiteUrl = builder.Configuration.GetValue<string>("CORS:WebsiteUrl") ?? throw new InvalidOperationException("CORS 'WebsiteUrl' not found.");
 
         builder.Services.AddIdentityApiEndpoints<CustomIdentityUser>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -60,7 +62,7 @@ public class Program
         app.UseCors(x => x
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .SetIsOriginAllowed(origin => true)
+            .SetIsOriginAllowed(origin => origin == corsWebsiteUrl)
             .AllowCredentials()
         );
         app.UseAuthorization();

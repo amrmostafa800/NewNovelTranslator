@@ -12,7 +12,7 @@ namespace WebApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class EntityNameController : ControllerBase //TDO use DataProtectionProvider to create protector to encrypt ID - Refactor Controllers (To make code more clean)
+public class EntityNameController : ControllerBase //TDO use IDataProtectionProvider to create protector to encrypt ID (Maybe Protect from CSRF Too I Not Sure) - Refactor Controllers (To make code more clean)
 {
     private readonly EntityNameService _entityNameService;
     private readonly IValidator<EntityNameDto> _entityNameValidator;
@@ -56,7 +56,7 @@ public class EntityNameController : ControllerBase //TDO use DataProtectionProvi
         //Check if user have acsses on this novel or not
         var novelUserIdOfThisEntity = _novelService.GetById(entityName.NovelId)!.UserId;
         
-        if (!_IsUserHaveAcsses(novelUserIdOfThisEntity))
+        if (!_IsUserHaveAccess(novelUserIdOfThisEntity))
         {
             return new BadRequestResponse
             {
@@ -136,7 +136,7 @@ public class EntityNameController : ControllerBase //TDO use DataProtectionProvi
         return Ok(_documentNlp.ExtractEntityNames());
     }
 
-    private bool _IsUserHaveAcsses(int novelUserId)
+    private bool _IsUserHaveAccess(int novelUserId)
     {
         var userId = _GetCurrentUserId();
         
