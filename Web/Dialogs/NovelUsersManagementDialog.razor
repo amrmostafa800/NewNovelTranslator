@@ -13,6 +13,7 @@
                 <TemplateColumn><CellTemplate><MudButton OnClick="@(()=> RemoveNovelUser(context.Item))">Remove</MudButton> </CellTemplate></TemplateColumn>
             </Columns>
         </MudDataGrid>
+        <MudAlert Severity="Severity.Warning">To Remove Novel You Add It Now You Need To Refresh Or Use Back Button</MudAlert>
     </DialogContent>
 </MudDialog>
 
@@ -21,7 +22,7 @@
     
     [Parameter] public int NovelId { get; set; }
 
-    NovelUserDto[] _novelUsers = Array.Empty<NovelUserDto>();
+    List<NovelUserDto> _novelUsers = new List<NovelUserDto>();
     
     protected override async Task OnInitializedAsync()
     {
@@ -64,7 +65,20 @@
 
     private async Task OpenAddNovelUserDialog()
     {
-        await DialogService.ShowAsync<AddNovelUserDialog>();
+        var parameters = new DialogParameters<AddCharacterNamesDialog>();
+        parameters.Add(p => p.NovelId, NovelId);
+        
+        var dialog = await DialogService.ShowAsync<AddNovelUserDialog>("Add Novel User",parameters);
+        var dialogResult = await dialog.Result;
+        var dialogData = dialogResult.Data as string;
+        if (string.IsNullOrEmpty(dialogData))
+        {
+            _novelUsers.Add(new NovelUserDto()
+            {
+                userName = dialogData!,
+                novelId = NovelId
+            });
+        }
     }
 
 }

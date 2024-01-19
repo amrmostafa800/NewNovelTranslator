@@ -19,29 +19,17 @@ public class NovelService
     public List<NovelDto> GetAllNovels()
     {
         var linqQuery = from novel in _context.Novels
+            join novelUser in _context.NovelUsers on novel.Id equals novelUser.NovelId
+            where novelUser.IsOwner == true
             select new NovelDto
             {
                 Id = novel.Id,
-                UserId = _context.NovelUsers
-                    .Where(n => n.NovelId == novel.Id)
-                    .Select(n => n.UserId)
-                    .FirstOrDefault(),
-                UserName = _context.NovelUsers
-                    .Where(n => n.NovelId == novel.Id)
-                    .Select(n => n.User.UserName)
-                    .FirstOrDefault(),
+                UserId = novelUser.UserId,
+                UserName = novelUser.User.UserName,
                 Name = novel.NovelName
             };
         
         return linqQuery.ToList();
-
-        // return _context.NovelUsers.Select(n => new NovelDto
-        // {
-        //     Id = n.NovelId,
-        //     UserId = n.UserId,
-        //     UserName = n.User!.UserName!,
-        //     Name = n.Novel!.NovelName!
-        // }).ToList();
     }
 
     public NovelDto? GetById(int id)
@@ -90,8 +78,8 @@ public class NovelService
         //Add Novel
         var novel = await _AddNovel(novelName);
 
-        //Add NovelUser
-        await _novelUserService.AddNovelUser(novel.Id, userIdWhoCreateNovel);
+        //Add NovelUser as Owner
+        await _novelUserService.AddNovelUser(novel.Id, userIdWhoCreateNovel,true);
         return novel.Id;
     }
 

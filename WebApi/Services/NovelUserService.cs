@@ -17,7 +17,7 @@ public class NovelUserService
         _novelSharedService = novelSharedService;
     }
 
-    public NovelUserDto[] GetNovelUsersByNovelId(int novelId)
+    public async Task<NovelUserDto[]> GetNovelUsersByNovelId(int novelId)
     {
         return _context.NovelUsers.Where(n => n.NovelId == novelId).Select(novelUser => new NovelUserDto()
         {
@@ -32,7 +32,7 @@ public class NovelUserService
         return await _context.NovelUsers.FirstOrDefaultAsync(n => n.Id == novelUserId);
     }
     
-    public async Task<EAddNovelUserResult> AddNovelUser(int novelId, string username)
+    public async Task<EAddNovelUserResult> AddNovelUser(int novelId, string username,bool isOwner = false)
     {
         var userId = await _context.Users.Where(u => u.UserName == username).Select(u => u.Id).FirstOrDefaultAsync();
 
@@ -44,7 +44,7 @@ public class NovelUserService
         return await AddNovelUser(novelId, userId);
     }
     
-    public async Task<EAddNovelUserResult> AddNovelUser(int novelId, int userId)
+    public async Task<EAddNovelUserResult> AddNovelUser(int novelId, int userId, bool isOwner = false)
     {
         if (await _novelSharedService.IsUserHavePermissionOnThisNovel(novelId, userId)) 
             return EAddNovelUserResult.AlreadyOwnPermission; // user already Have Permission in this novel
@@ -52,7 +52,8 @@ public class NovelUserService
         var novelUser = new NovelUser
         {
             NovelId = novelId,
-            UserId = userId
+            UserId = userId,
+            IsOwner = isOwner
         };
 
         await _context.NovelUsers.AddAsync(novelUser);

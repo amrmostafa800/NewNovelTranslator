@@ -13,21 +13,21 @@ public class NovelUserService
         _client = client;
     }
 
-    public async Task<NovelUserDto[]> GetNovelUsersByNovelId(int novelId)
+    public async Task<List<NovelUserDto>> GetNovelUsersByNovelId(int novelId)
     {
         try
         {
-            var novels = await _client.GetFromJsonAsync<NovelUserDto[]>($"api/NovelUser/{novelId}")!;
+            var novels = await _client.GetFromJsonAsync<List<NovelUserDto>>($"api/NovelUser/{novelId}")!;
             
             if (novels != null)
                 return novels;
             
-            return Array.Empty<NovelUserDto>();
+            return new List<NovelUserDto>();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error : {ex.Message}");
-            return Array.Empty<NovelUserDto>();
+            return new List<NovelUserDto>();
         }
     }
 

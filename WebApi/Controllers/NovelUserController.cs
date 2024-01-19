@@ -66,7 +66,6 @@ public class NovelUserController : ControllerBase
 
         //Add NovelUser
         var addResult = await _novelUserService.AddNovelUser(novelUser.NovelId, novelUser.UserName);
-
         switch (addResult)
         {
             case EAddNovelUserResult.Success:
@@ -96,13 +95,13 @@ public class NovelUserController : ControllerBase
         
     }
     
-    [HttpDelete("{novelUserId}")]
+    [HttpDelete("{novelId}/{novelUserId}")]
     [Authorize]
-    public async Task<IActionResult> RemoveNovelUser(int novelUserId)
+    public async Task<IActionResult> RemoveNovelUser(int novelId,int novelUserId)
     {
-        var novelUser = await _novelUserService.GetNovelUser(novelUserId);
+        var novelUser = await _novelUserService.GetNovelUsersByNovelId(novelId);
         
-        if (novelUser?.UserId != User.GetCurrentUserId()) //check if current User Have Permission To Delete This NovelUser
+        if (novelUser[0].NovelUserId != User.GetCurrentUserId()) //check if current User Have Permission To Delete This NovelUser
         {
             return new BadRequestResponse
             {
@@ -111,7 +110,7 @@ public class NovelUserController : ControllerBase
         }
 
         //Remove NovelUser
-        var removeResult = await _novelUserService.RemoveNovelUserByNovelUserId(novelUserId, novelUser.UserId);
+        var removeResult = await _novelUserService.RemoveNovelUserByNovelUserId(novelUserId, novelUser[0].NovelUserId);
 
         switch (removeResult)
         {

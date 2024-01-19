@@ -47,6 +47,8 @@
                 DialogService?.ShowMessageBox("Error", "Unknown Error ");
                 break;
         }
+        
+        MudDialog.Close(DialogResult.Ok(_usernameTextField?.Text));
     }
 
 }
