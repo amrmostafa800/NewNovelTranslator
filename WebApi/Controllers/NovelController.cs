@@ -125,7 +125,7 @@ public class NovelController : ControllerBase //TDO use DataProtectionProvider t
     [HttpPost("CheckIfOwnPermissionOnNovel")]
     public async Task<IActionResult> CheckIfOwnPermissionOnNovel(CheckForPermissionDto checkForPermission)
     {
-        var result = await _novelSharedService.IsUserOwnThisNovel(checkForPermission.NovelId, checkForPermission.UserId);
+        var result = await _novelSharedService.IsUserHavePermissionOnThisNovel(checkForPermission.NovelId, checkForPermission.UserId);
         
         if (result)
         {

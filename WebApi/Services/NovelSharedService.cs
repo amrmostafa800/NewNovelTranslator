@@ -12,7 +12,7 @@ public class NovelSharedService
         _context = context;
     }
 
-    public async Task<bool> IsUserOwnThisNovel(int novelId, int userId)
+    public async Task<bool> IsUserHavePermissionOnThisNovel(int novelId, int userId)
     {
         var novel = await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelId == novelId && n.UserId == userId);
         return novel != null;
