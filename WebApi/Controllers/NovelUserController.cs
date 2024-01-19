@@ -16,10 +16,10 @@ public class NovelUserController : ControllerBase
 {
     private readonly NovelService _novelService;
     private readonly NovelUserService _novelUserService;
-    private readonly IValidator<NovelUserDto> _novelUserValidator;
+    private readonly IValidator<AddNovelUserDto> _novelUserValidator;
 
     public NovelUserController(NovelService novelService, NovelUserService novelUserService,
-        IValidator<NovelUserDto> novelUserValidator)
+        IValidator<AddNovelUserDto> novelUserValidator)
     {
         _novelService = novelService;
         _novelUserService = novelUserService;
@@ -36,7 +36,7 @@ public class NovelUserController : ControllerBase
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> AddNovelUser([FromBody] NovelUserDto novelUser)
+    public async Task<IActionResult> AddNovelUser([FromBody] AddNovelUserDto novelUser)
     {
         var validationResult = await _novelUserValidator.ValidateAsync(novelUser);
 
@@ -65,18 +65,35 @@ public class NovelUserController : ControllerBase
         }
 
         //Add NovelUser
-        if (await _novelUserService.AddNovelUser(novelUser.NovelId, novelUser.UserName))
-        {
-            return new OkResponse
-            {
-                Description = "Added"
-            };
-        }
+        var addResult = await _novelUserService.AddNovelUser(novelUser.NovelId, novelUser.UserName);
 
-        return new BadRequestResponse
+        switch (addResult)
         {
-            Description = "User Already Have Permission On This Novel"
-        };
+            case EAddNovelUserResult.Success:
+                return new OkResponse
+                {
+                    Description = "Added"
+                };
+            
+            case EAddNovelUserResult.AlreadyOwnPermission:
+                return new BadRequestResponse
+                {
+                    Description = "User Already Have Permission On This Novel"
+                };
+            
+            case EAddNovelUserResult.UsernameNotExist:
+                return new BadRequestResponse
+                {
+                    Description = "This Username Not Exist"
+                };
+            
+            default:
+                return new BadRequestResponse
+                {
+                    Description = "Unknown Error"
+                };
+        }
+        
     }
     
     [HttpDelete("{novelUserId}")]

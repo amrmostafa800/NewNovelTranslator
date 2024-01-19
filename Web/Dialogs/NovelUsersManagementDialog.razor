@@ -1,12 +1,15 @@
 ﻿@using Web.Services
 @using Web.Models
+@using Web.Enums
 @inject NovelUserService NovelUserService
+@inject IDialogService DialogService
 <MudDialog>
     <DialogContent>
         <MudButton FullWidth="true" OnClick="@Back">Back</MudButton>
-        <MudDataGrid Items="@_novelUsers">
+        <MudDataGrid T="NovelUserDto" Items="@_novelUsers" Bordered="true" Dense="true">
             <Columns>
                 <PropertyColumn Property="x => x.userName" Title="Username" />
+                <TemplateColumn><CellTemplate><MudButton OnClick="@(()=> RemoveNovelUser(context.Item))">Remove</MudButton> </CellTemplate></TemplateColumn>
             </Columns>
         </MudDataGrid>
     </DialogContent>
@@ -25,4 +28,37 @@
     }
 
     void Back() => MudDialog.Cancel();
+
+    private async Task RemoveNovelUser(NovelUserDto? contextItem)
+    {
+        var result = await NovelUserService?.RemoveNovelUser(contextItem!.NovelUserId)!;
+
+        switch (result)
+        {
+            case ERemoveNovelUser.Success:
+                DialogService?.ShowMessageBox("Ok", "Removed");
+                break;
+                
+            case ERemoveNovelUser.ServerError:
+                DialogService?.ShowMessageBox("Error", "Server Error");
+                break;
+                
+            case ERemoveNovelUser.NoPermission:
+                DialogService?.ShowMessageBox("Error", "No Permission");
+                break;
+                
+            case ERemoveNovelUser.ThisNovelUserIdNotExist: // Will Not Happen If Web Api Not Edited
+                DialogService?.ShowMessageBox("Error", "Id Not Exist");
+                break;
+                
+            case ERemoveNovelUser.OwnerTryRemoveItself:
+                DialogService?.ShowMessageBox("Error", "You Cant Remove Yourself, You Are Owner Of Novel");
+                break;
+                
+            case ERemoveNovelUser.UnknownError:
+                DialogService?.ShowMessageBox("Error", "Unknown Error Please Report Admin");
+                break;
+        }
+    }
+
 }

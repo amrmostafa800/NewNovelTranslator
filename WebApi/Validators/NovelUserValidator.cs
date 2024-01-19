@@ -3,7 +3,7 @@ using WebApi.DTOs;
 
 namespace WebApi.Validators;
 
-public class NovelUserValidator : AbstractValidator<NovelUserDto>
+public class NovelUserValidator : AbstractValidator<AddNovelUserDto>
 {
     public NovelUserValidator()
     {

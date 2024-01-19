@@ -7,7 +7,7 @@
 <MudButton OnClick="@Back">Back</MudButton>
 <MudDialog>
     <DialogContent>
-        <MudTable Items="@_characterNames" @bind-SelectedItem="_selectedItem" Hover="true" Breakpoint="Breakpoint.Sm" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" RowEditCommit="WhenItemUpdated">
+        <MudTable Class="cursor-pointer" Items="@_characterNames" @bind-SelectedItem="_selectedItem" Hover="true" Breakpoint="Breakpoint.Sm" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues" RowEditCommit="WhenItemUpdated">
             <HeaderContent>
                 <MudTh>EnglishName</MudTh>
                 <MudTh>ArabicName</MudTh>

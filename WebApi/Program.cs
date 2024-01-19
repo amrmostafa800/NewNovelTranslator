@@ -47,7 +47,7 @@ public class Program
         builder.Services.AddScoped<NovelSharedService>();
         builder.Services.AddScoped<EntityNameService>();
         builder.Services.AddScoped<IValidator<CreateNovelDto>, NovelValidator>();
-        builder.Services.AddScoped<IValidator<NovelUserDto>, NovelUserValidator>();
+        builder.Services.AddScoped<IValidator<AddNovelUserDto>, NovelUserValidator>();
         builder.Services.AddScoped<IValidator<EntityNameDto>, EntityNameValidator>();
 
         var app = builder.Build();

@@ -32,22 +32,22 @@ public class NovelUserService
         return await _context.NovelUsers.FirstOrDefaultAsync(n => n.Id == novelUserId);
     }
     
-    public async Task<bool> AddNovelUser(int novelId, string username)
+    public async Task<EAddNovelUserResult> AddNovelUser(int novelId, string username)
     {
         var userId = await _context.Users.Where(u => u.UserName == username).Select(u => u.Id).FirstOrDefaultAsync();
 
         if (userId == 0)
         {
-            return false;
+            return EAddNovelUserResult.UsernameNotExist;
         }
         
         return await AddNovelUser(novelId, userId);
     }
     
-    public async Task<bool> AddNovelUser(int novelId, int userId)
+    public async Task<EAddNovelUserResult> AddNovelUser(int novelId, int userId)
     {
         if (await _novelSharedService.IsUserHavePermissionOnThisNovel(novelId, userId)) 
-            return false; // user already Have Permission in this novel
+            return EAddNovelUserResult.AlreadyOwnPermission; // user already Have Permission in this novel
         
         var novelUser = new NovelUser
         {
@@ -57,7 +57,12 @@ public class NovelUserService
 
         await _context.NovelUsers.AddAsync(novelUser);
 
-        return await _context.SaveChangesAsync() != 0; // check if Added Successfully
+        if (await _context.SaveChangesAsync() != 0)
+        {
+            return EAddNovelUserResult.Success;
+        }
+        
+        return EAddNovelUserResult.UnknownError;
     }
     
     public async Task<bool> RemoveNovelUser(int novelId, string username)
