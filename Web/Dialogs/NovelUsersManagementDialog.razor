@@ -6,14 +6,14 @@
 <MudDialog>
     <DialogContent>
         <MudButton FullWidth="true" OnClick="@Back">Back</MudButton>
-        <MudButton OnClick="@OpenAddNovelUserDialog">Add Novel</MudButton>
+        <MudButton OnClick="@OpenAddNovelUserDialog">Add User</MudButton>
         <MudDataGrid T="NovelUserDto" Items="@_novelUsers" Bordered="true" Dense="true">
             <Columns>
                 <PropertyColumn Property="x => x.userName" Title="Username" />
                 <TemplateColumn><CellTemplate><MudButton OnClick="@(()=> RemoveNovelUser(context.Item))">Remove</MudButton> </CellTemplate></TemplateColumn>
             </Columns>
         </MudDataGrid>
-        <MudAlert Severity="Severity.Warning">To Remove Novel You Add It Now You Need To Refresh Or Use Back Button</MudAlert>
+        <MudAlert Severity="Severity.Warning">After Add User You Need To Use Back Button Or Refresh Page To Show It Here</MudAlert>
     </DialogContent>
 </MudDialog>
 
@@ -31,14 +31,15 @@
 
     void Back() => MudDialog.Cancel();
 
-    private async Task RemoveNovelUser(NovelUserDto? contextItem)
+    private async Task RemoveNovelUser(NovelUserDto? novelUser)
     {
-        var result = await NovelUserService?.RemoveNovelUser(contextItem!.NovelUserId)!;
+        var result = await NovelUserService?.RemoveNovelUser(NovelId, novelUser!.NovelUserId)!;
 
         switch (result)
         {
             case ERemoveNovelUser.Success:
                 DialogService?.ShowMessageBox("Ok", "Removed");
+                _novelUsers.Remove(novelUser!);
                 break;
                 
             case ERemoveNovelUser.ServerError:
@@ -68,17 +69,17 @@
         var parameters = new DialogParameters<AddCharacterNamesDialog>();
         parameters.Add(p => p.NovelId, NovelId);
         
-        var dialog = await DialogService.ShowAsync<AddNovelUserDialog>("Add Novel User",parameters);
-        var dialogResult = await dialog.Result;
-        var dialogData = dialogResult.Data as string;
-        if (string.IsNullOrEmpty(dialogData))
-        {
-            _novelUsers.Add(new NovelUserDto()
-            {
-                userName = dialogData!,
-                novelId = NovelId
-            });
-        }
+        var dialog = await DialogService.ShowAsync<AddNovelUserDialog>("Add User",parameters);
+        // var dialogResult = await dialog.Result;
+        // var dialogData = dialogResult.Data as string;
+        // if (string.IsNullOrEmpty(dialogData))
+        // {
+        //     _novelUsers.Add(new NovelUserDto()
+        //     {
+        //         userName = dialogData!,
+        //         novelId = NovelId
+        //     });
+        // }
     }
 
 }

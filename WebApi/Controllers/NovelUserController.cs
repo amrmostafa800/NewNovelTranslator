@@ -99,9 +99,9 @@ public class NovelUserController : ControllerBase
     [Authorize]
     public async Task<IActionResult> RemoveNovelUser(int novelId,int novelUserId)
     {
-        var novelUser = await _novelUserService.GetNovelUsersByNovelId(novelId);
+        var novelUser = await _novelUserService.GetNovelUserOwnerByNovelId(novelId);
         
-        if (novelUser[0].NovelUserId != User.GetCurrentUserId()) //check if current User Have Permission To Delete This NovelUser
+        if (novelUser?.UserId != User.GetCurrentUserId()) //check if current User Have Permission To Delete This NovelUser
         {
             return new BadRequestResponse
             {
@@ -110,7 +110,7 @@ public class NovelUserController : ControllerBase
         }
 
         //Remove NovelUser
-        var removeResult = await _novelUserService.RemoveNovelUserByNovelUserId(novelUserId, novelUser[0].NovelUserId);
+        var removeResult = await _novelUserService.RemoveNovelUserByNovelUserId(novelUserId, novelUser.UserId);
 
         switch (removeResult)
         {

@@ -66,11 +66,11 @@ public class NovelUserService
         return EAddNovelUserResult.UnknownError;
     }
     
-    public async Task<ERemoveNovelUser> RemoveNovelUser(int novelUserId)
+    public async Task<ERemoveNovelUser> RemoveNovelUser(int novelId,int novelUserId)
     {
         try
         {
-            var novels = await _client.DeleteAsync($"api/NovelUser/{novelUserId}")!;
+            var novels = await _client.DeleteAsync($"api/NovelUser/{novelId}/{novelUserId}")!;
             var responseContent = await novels.Content.ReadAsStringAsync();
 
             if (responseContent.Contains("Removed"))

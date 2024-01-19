@@ -17,7 +17,7 @@ public class NovelUserService
         _novelSharedService = novelSharedService;
     }
 
-    public async Task<NovelUserDto[]> GetNovelUsersByNovelId(int novelId)
+    public NovelUserDto[] GetNovelUsersByNovelId(int novelId)
     {
         return _context.NovelUsers.Where(n => n.NovelId == novelId).Select(novelUser => new NovelUserDto()
         {
@@ -30,6 +30,11 @@ public class NovelUserService
     public async Task<NovelUser?> GetNovelUser(int novelUserId)
     {
         return await _context.NovelUsers.FirstOrDefaultAsync(n => n.Id == novelUserId);
+    }
+    
+    public async Task<NovelUser?> GetNovelUserOwnerByNovelId(int novelId)
+    {
+        return await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelId == novelId && n.IsOwner == true);
     }
     
     public async Task<EAddNovelUserResult> AddNovelUser(int novelId, string username,bool isOwner = false)
@@ -97,7 +102,7 @@ public class NovelUserService
         if (novelUser is null)
             return ERemoveNovelUserResult.ThisNovelUserIdNotExist;
 
-        if (novelUser.UserId == userId) // Mean Owner Of Novel Try Remove Itself
+        if (novelUser.UserId == userId || novelUser.IsOwner) // Mean Owner Of Novel Try Remove Itself
         {
             return ERemoveNovelUserResult.OwnerTryRemoveItself;
         }
