@@ -1,9 +1,14 @@
 ﻿@using Web.Services
-@inject NovelService NovelService
+@using Web.Models
+@inject NovelUserService NovelUserService
 <MudDialog>
     <DialogContent>
         <MudButton FullWidth="true" OnClick="@Back">Back</MudButton>
-        
+        <MudDataGrid Items="@_novelUsers">
+            <Columns>
+                <PropertyColumn Property="x => x.userName" Title="Username" />
+            </Columns>
+        </MudDataGrid>
     </DialogContent>
 </MudDialog>
 
@@ -11,6 +16,13 @@
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     
     [Parameter] public int NovelId { get; set; }
+
+    NovelUserDto[] _novelUsers = Array.Empty<NovelUserDto>();
     
+    protected override async Task OnInitializedAsync()
+    {
+        _novelUsers = await NovelUserService.GetNovelUsersByNovelId(NovelId);
+    }
+
     void Back() => MudDialog.Cancel();
 }

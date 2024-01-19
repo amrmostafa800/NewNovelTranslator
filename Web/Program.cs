@@ -28,5 +28,6 @@ builder.Services
 builder.Services.AddScoped<NovelService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CharacterNameService>();
+builder.Services.AddScoped<NovelUserService>();
 
 await builder.Build().RunAsync();

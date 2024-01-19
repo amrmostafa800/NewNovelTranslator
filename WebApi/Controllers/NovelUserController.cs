@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.DTOs;
+using WebApi.Enums;
 using WebApi.Extensions;
 using WebApi.Responses;
 using WebApi.Services;
@@ -78,29 +79,13 @@ public class NovelUserController : ControllerBase
         };
     }
     
-    [HttpDelete]
+    [HttpDelete("{novelUserId}")]
     [Authorize]
-    public async Task<IActionResult> RemoveNovelUser([FromBody] NovelUserDto novelUser)
+    public async Task<IActionResult> RemoveNovelUser(int novelUserId)
     {
-        var validationResult = await _novelUserValidator.ValidateAsync(novelUser);
-
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(validationResult.Errors);
-        }
-
-        //Check If CurrentUser Have Permission To Novel
-        var novel = _novelService.GetById(novelUser.NovelId);
-
-        if (novel == null) // check if novel not exist
-        {
-            return new BadRequestResponse
-            {
-                Description = "No Novel With This Id"
-            };
-        }
-
-        if (novel.UserId != User.GetCurrentUserId()) //check if current User Have Permission To Delete This NovelUser
+        var novelUser = await _novelUserService.GetNovelUser(novelUserId);
+        
+        if (novelUser?.UserId != User.GetCurrentUserId()) //check if current User Have Permission To Delete This NovelUser
         {
             return new BadRequestResponse
             {
@@ -108,26 +93,41 @@ public class NovelUserController : ControllerBase
             };
         }
 
-        if (novel.UserName == novelUser.UserName)
-        {
-            return new BadRequestResponse
-            {
-                Description = "You Cant Remove Yourself From Novel"
-            };
-        }
-
         //Remove NovelUser
-        if (await _novelUserService.RemoveNovelUser(novelUser.NovelId, novelUser.UserName))
-        {
-            return new OkResponse
-            {
-                Description = "Removed"
-            };
-        }
+        var removeResult = await _novelUserService.RemoveNovelUserByNovelUserId(novelUserId, novelUser.UserId);
 
-        return new BadRequestResponse
+        switch (removeResult)
         {
-            Description = "User Already Dont Have Permission On This Novel"
-        };
+            case ERemoveNovelUserResult.Success:
+                return new OkResponse
+                {
+                    Description = "Removed"
+                };
+            
+            case ERemoveNovelUserResult.AlreadyDontOwnPermission:
+                return new BadRequestResponse
+                {
+                    Description = "User Already Dont Have Permission On This Novel"
+                };
+            
+            case ERemoveNovelUserResult.OwnerTryRemoveItself:
+                return new BadRequestResponse
+                {
+                    Description = "You Cant Remove Yourself"
+                };
+            
+            case ERemoveNovelUserResult.ThisNovelUserIdNotExist:
+                return new BadRequestResponse
+                {
+                    Description = "There is No NovelUser With This Id"
+                };
+            
+            default:
+                return new BadRequestResponse
+                {
+                    Description = "Unknown Error"
+                };
+        }
+        
     }
 }

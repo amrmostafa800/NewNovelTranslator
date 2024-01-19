@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
 using WebApi.DTOs;
+using WebApi.Enums;
 using WebApi.Models;
 
 namespace WebApi.Services;
@@ -21,8 +22,14 @@ public class NovelUserService
         return _context.NovelUsers.Where(n => n.NovelId == novelId).Select(novelUser => new NovelUserDto()
         {
             UserName = novelUser.User!.UserName!,
-            NovelId = novelUser.NovelId
+            NovelUserId = novelUser.Id,
+            NovelId = novelUser.NovelId,
         }).ToArray();
+    }
+
+    public async Task<NovelUser?> GetNovelUser(int novelUserId)
+    {
+        return await _context.NovelUsers.FirstOrDefaultAsync(n => n.Id == novelUserId);
     }
     
     public async Task<bool> AddNovelUser(int novelId, string username)
@@ -67,9 +74,6 @@ public class NovelUserService
     
     public async Task<bool> RemoveNovelUser(int novelId, int userId)
     {
-        if (!await _novelSharedService.IsUserHavePermissionOnThisNovel(novelId, userId)) 
-            return false; // user already Dont Have Permission in this novel
-
         var novelUser = await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelId == novelId && n.UserId == userId);
 
         if (novelUser is null)
@@ -78,5 +82,27 @@ public class NovelUserService
         _context.NovelUsers.Remove(novelUser);
 
         return await _context.SaveChangesAsync() != 0; // check if Removed Successfully
+    }
+    
+    public async Task<ERemoveNovelUserResult> RemoveNovelUserByNovelUserId(int novelUserId,int userId)
+    {
+        var novelUser = await _context.NovelUsers.FirstOrDefaultAsync(n => n.Id == novelUserId);
+
+        if (novelUser is null)
+            return ERemoveNovelUserResult.ThisNovelUserIdNotExist;
+
+        if (novelUser.UserId == userId) // Mean Owner Of Novel Try Remove Itself
+        {
+            return ERemoveNovelUserResult.OwnerTryRemoveItself;
+        }
+        
+        _context.NovelUsers.Remove(novelUser);
+
+        if (await _context.SaveChangesAsync() == 0)
+        {
+            return ERemoveNovelUserResult.AlreadyDontOwnPermission;
+        }
+
+        return ERemoveNovelUserResult.Success;
     }
 }
