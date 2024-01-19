@@ -18,13 +18,30 @@ public class NovelService
 
     public List<NovelDto> GetAllNovels()
     {
-        return _context.NovelUsers.Select(n => new NovelDto
-        {
-            Id = n.NovelId,
-            UserId = n.UserId,
-            UserName = n.User!.UserName!,
-            Name = n.Novel!.NovelName!
-        }).ToList();
+        var linqQuery = from novel in _context.Novels
+            select new NovelDto
+            {
+                Id = novel.Id,
+                UserId = _context.NovelUsers
+                    .Where(n => n.NovelId == novel.Id)
+                    .Select(n => n.UserId)
+                    .FirstOrDefault(),
+                UserName = _context.NovelUsers
+                    .Where(n => n.NovelId == novel.Id)
+                    .Select(n => n.User.UserName)
+                    .FirstOrDefault(),
+                Name = novel.NovelName
+            };
+        
+        return linqQuery.ToList();
+
+        // return _context.NovelUsers.Select(n => new NovelDto
+        // {
+        //     Id = n.NovelId,
+        //     UserId = n.UserId,
+        //     UserName = n.User!.UserName!,
+        //     Name = n.Novel!.NovelName!
+        // }).ToList();
     }
 
     public NovelDto? GetById(int id)

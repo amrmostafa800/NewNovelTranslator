@@ -1,10 +1,15 @@
 ﻿@using Web.Services
+@using Web.Enums
 @inject NovelUserService NovelUserService
 @inject IDialogService DialogService
 <MudDialog>
     <DialogContent>
-        <MudTextField @ref="_usernameTextField" Label="Username" Variant="Variant.Text"></MudTextField>
+        <MudTextField T="string" @ref="_usernameTextField" Label="Username" Variant="Variant.Text"></MudTextField>
     </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="@Back">Cancel</MudButton>
+            <MudButton Color="Color.Primary" OnClick="@Submit">Ok</MudButton>
+        </DialogActions>
 </MudDialog>
 
 @code {
@@ -13,12 +18,35 @@
     [Parameter] public int NovelId { get; set; }
 
     MudTextField<string>? _usernameTextField;
-    
-    protected override async Task OnInitializedAsync()
-    {
-        
-    }
 
     void Back() => MudDialog.Cancel();
+
+    private async Task Submit()
+    {
+        var result = await NovelUserService.AddNovelUser(NovelId, _usernameTextField?.Text!);
+
+        switch (result)
+        {
+            case EAddNovelUserResult.Success:
+                DialogService?.ShowMessageBox("Ok", "Success");
+                break;
+                
+            case EAddNovelUserResult.AlreadyOwnPermission:
+                DialogService?.ShowMessageBox("Error", "Username Already Own Permission");
+                break;
+                
+            case EAddNovelUserResult.UsernameNotExist:
+                DialogService?.ShowMessageBox("Error", "Username Not Exist");
+                break;
+                
+            case EAddNovelUserResult.ServerError:
+                DialogService?.ShowMessageBox("Error", "Server Error ");
+                break;
+                
+            case EAddNovelUserResult.UnknownError:
+                DialogService?.ShowMessageBox("Error", "Unknown Error ");
+                break;
+        }
+    }
 
 }

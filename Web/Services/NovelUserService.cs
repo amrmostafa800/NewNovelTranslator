@@ -30,6 +30,41 @@ public class NovelUserService
             return Array.Empty<NovelUserDto>();
         }
     }
+
+    public async Task<EAddNovelUserResult> AddNovelUser(int novelId, string username)
+    {
+        var json = new
+        {
+            novelId,
+            username
+        };
+        
+        try
+        {
+            var novels = await _client.PostAsJsonAsync($"api/NovelUser",json)!;
+            var responseContent = await novels.Content.ReadAsStringAsync();
+
+            if (responseContent.Contains("Added"))
+            {
+                return EAddNovelUserResult.Success;
+            }
+            if (responseContent.Contains("User Already Have Permission On This Novel"))
+            {
+                return EAddNovelUserResult.AlreadyOwnPermission;
+            }
+            if (responseContent.Contains("This Username Not Exist"))
+            {
+                return EAddNovelUserResult.UsernameNotExist;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error : {ex.Message}");
+            return EAddNovelUserResult.ServerError;
+        }
+
+        return EAddNovelUserResult.UnknownError;
+    }
     
     public async Task<ERemoveNovelUser> RemoveNovelUser(int novelUserId)
     {
