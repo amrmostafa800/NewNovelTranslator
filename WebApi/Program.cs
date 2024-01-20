@@ -21,7 +21,6 @@ public class Program
             options.UseSqlServer(connectionString));
         
         var websiteUrl = builder.Configuration.GetValue<string>("Settings:WebsiteUrl") ?? throw new InvalidOperationException("CORS 'WebsiteUrl' not found.");
-        var apiUrl = builder.Configuration.GetValue<string>("Settings:ApiUrl") ?? throw new InvalidOperationException("CORS 'WebsiteUrl' not found.");
 
         builder.Services.AddIdentityApiEndpoints<CustomIdentityUser>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
