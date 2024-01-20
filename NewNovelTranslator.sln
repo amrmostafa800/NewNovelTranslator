@@ -2,8 +2,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestProject", "TestProject\TestProject.csproj", "{48EF7CB5-1261-4D6B-8A8A-CCDDDF345812}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NovelTextProcessor", "NovelTextProcessor\NovelTextProcessor.csproj", "{D4B37E21-D1B9-4F8C-9C09-17330C280747}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{19FBECED-5175-4FA6-AA04-DD1B78F270E7}"
@@ -16,10 +14,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{48EF7CB5-1261-4D6B-8A8A-CCDDDF345812}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{48EF7CB5-1261-4D6B-8A8A-CCDDDF345812}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{48EF7CB5-1261-4D6B-8A8A-CCDDDF345812}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{48EF7CB5-1261-4D6B-8A8A-CCDDDF345812}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D4B37E21-D1B9-4F8C-9C09-17330C280747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D4B37E21-D1B9-4F8C-9C09-17330C280747}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4B37E21-D1B9-4F8C-9C09-17330C280747}.Release|Any CPU.ActiveCfg = Release|Any CPU
