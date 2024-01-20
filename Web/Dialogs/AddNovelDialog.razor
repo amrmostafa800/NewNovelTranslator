@@ -31,14 +31,14 @@
         {
             switch (await _novelService.AddNovel(NovelName!.Text!))
             {
-                case EaddNovelResult.Success:
+                case ENovelResult.Success:
                     MudDialog.Close(DialogResult.Ok(true));
                     _navigationManager.Refresh();
                     break;
-                case EaddNovelResult.AuthRequired:
+                case ENovelResult.AuthRequired:
                     await _dialogService.ShowMessageBox("Error", "Please Login First");
                     break;
-                case EaddNovelResult.ServerError:
+                case ENovelResult.ServerError:
                     await _dialogService.ShowMessageBox("Error", "Api Server Down Or Uknown Error Please Report");
                     break;
                 default:

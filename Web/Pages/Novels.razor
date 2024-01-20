@@ -2,13 +2,14 @@
 @using Web.Models
 @using Web.Services
 @using Web.Dialogs
+@using Web.Enums
 @inject NovelService NovelService;
 @inject IDialogService DialogService
 @inject UserService UserService
 <PageTitle>Novels</PageTitle>
 
 <MudButton OnClick="@OpenAddNovelDialog">Add Novel</MudButton>
-<MudTable Class="cursor-pointer" T="NovelDto" RowClass="cursor-pointer" Items="@_novels" Hover="true" Breakpoint="Breakpoint.Sm" @ref="_novelsTable" OnRowClick="OnNovelRowClick">
+<MudTable Class="cursor-pointer" T="NovelDto" RowClass="cursor-pointer" Items="@_novels" Hover="true" Breakpoint="Breakpoint.Sm" @ref="_novelsTable" OnRowClick="@OnNovelRowClick">
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Owner</MudTh>
@@ -16,6 +17,7 @@
     <RowTemplate>
         <MudTd DataLabel="Name">@context.Name</MudTd>
         <MudTd DataLabel="Username">@context.UserName</MudTd>
+        <MudButton OnClick="@(()=> RemoveNovel(context))">Remove</MudButton>
         <MudTd Class="invisible" DataLabel="ID">@context.Id</MudTd>
         <MudTd Class="invisible" DataLabel="UserId">@context.UserId</MudTd>
     </RowTemplate>
@@ -25,7 +27,7 @@
 
     private MudTable<NovelDto>? _novelsTable;
 
-    NovelDto[] _novels = Array.Empty<NovelDto>();
+    List<NovelDto> _novels = new List<NovelDto>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -67,5 +69,34 @@
     {
         return UserService.CurrentUsername == username;
     }
-    
+
+    private async Task RemoveNovel(NovelDto context)
+    {
+        var result = await NovelService.RemoveNovel(context.Id);
+
+        switch (result)
+        {
+            case ENovelResult.Success:
+                _novels.Remove(context);
+                DialogService?.ShowMessageBox("OK", "Deleted");
+                break;
+                
+            case ENovelResult.AuthRequired:
+                DialogService?.ShowMessageBox("Error", "Please Login First");
+                break;
+                
+            case ENovelResult.NotExist:
+                DialogService?.ShowMessageBox("Error", "Novel Id Not Exist");
+                break;
+                
+            case ENovelResult.DontOwnPermission:
+                DialogService?.ShowMessageBox("Error", "You Dont Have Permission To Delete Novel");
+                break;
+                
+            case ENovelResult.ServerError:
+                DialogService?.ShowMessageBox("Error", "Server Error, Please Contact Admin");
+                break;
+        }
+    }
+
 }

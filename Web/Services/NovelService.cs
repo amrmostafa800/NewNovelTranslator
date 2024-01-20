@@ -16,25 +16,25 @@ public class NovelService
         _client = client;
     }
 
-    public async Task<NovelDto[]> GetAllNovels()
+    public async Task<List<NovelDto>> GetAllNovels()
     {
         try
         {
-            var novels = await _client.GetFromJsonAsync<NovelDto[]>("api/Novel")!;
+            var novels = await _client.GetFromJsonAsync<List<NovelDto>>("api/Novel")!;
             
             if (novels != null)
                 return novels;
             
-            return Array.Empty<NovelDto>();
+            return new List<NovelDto>();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error : {ex.Message}");
-            return Array.Empty<NovelDto>();
+            return new List<NovelDto>();
         }
     }
 
-    public async Task<EaddNovelResult> AddNovel(string novelName)
+    public async Task<ENovelResult> AddNovel(string novelName)
     {
         var addNovel = new
         {
@@ -44,14 +44,39 @@ public class NovelService
         var response = await _client.PostAsJsonAsync("api/Novel",addNovel)!;
         
         if (response.IsSuccessStatusCode)
-            return EaddNovelResult.Success;
+            return ENovelResult.Success;
         
         if (response.StatusCode == HttpStatusCode.Unauthorized)
-            return EaddNovelResult.AuthRequired;
+            return ENovelResult.AuthRequired;
         
-        return EaddNovelResult.ServerError;
+        return ENovelResult.ServerError;
     }
 
+    public async Task<ENovelResult> RemoveNovel(int novelId)
+    {
+
+        var response = await _client.DeleteAsync($"api/Novel/{novelId}")!;
+        var responseContent = await response.Content.ReadAsStringAsync();
+        
+        if (response.IsSuccessStatusCode)
+            return ENovelResult.Success;
+        
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+            return ENovelResult.AuthRequired;
+
+        if (responseContent.Contains("No Novel With This Id"))
+        {
+            return ENovelResult.NotExist;
+        }
+        
+        if (responseContent.Contains("You Cant Delete Novel Not Created By You"))
+        {
+            return ENovelResult.DontOwnPermission;
+        }
+        
+        return ENovelResult.ServerError;
+    }
+    
     public async Task<string> Translate(string text,int novelId)
     {
         var json = new
