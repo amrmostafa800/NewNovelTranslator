@@ -12,3 +12,5 @@ WebApi
 
 Website Is Live : https://novelspace.xyz/
 but its very slow (free host)
+------------------------------------------------------
+Please Open Issue If Found Any Bug
