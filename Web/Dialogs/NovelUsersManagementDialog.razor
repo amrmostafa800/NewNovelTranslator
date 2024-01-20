@@ -13,7 +13,6 @@
                 <TemplateColumn><CellTemplate><MudButton OnClick="@(()=> RemoveNovelUser(context.Item))">Remove</MudButton> </CellTemplate></TemplateColumn>
             </Columns>
         </MudDataGrid>
-        <MudAlert Severity="Severity.Warning">After Add User You Need To Use Back Button Or Refresh Page To Show It Here</MudAlert>
     </DialogContent>
 </MudDialog>
 
@@ -70,16 +69,13 @@
         parameters.Add(p => p.NovelId, NovelId);
         
         var dialog = await DialogService.ShowAsync<AddNovelUserDialog>("Add User",parameters);
-        // var dialogResult = await dialog.Result;
-        // var dialogData = dialogResult.Data as string;
-        // if (string.IsNullOrEmpty(dialogData))
-        // {
-        //     _novelUsers.Add(new NovelUserDto()
-        //     {
-        //         userName = dialogData!,
-        //         novelId = NovelId
-        //     });
-        // }
+        var dialogResult = await dialog.Result;
+        var dialogData = dialogResult.Data as NovelUserDto;
+        
+        if (!string.IsNullOrEmpty(dialogData?.userName))
+        {
+            _novelUsers.Add(dialogData);
+        }
     }
 
 }

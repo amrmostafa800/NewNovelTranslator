@@ -1,5 +1,6 @@
 ﻿@using Web.Services
 @using Web.Enums
+@using Web.Models
 @inject NovelUserService NovelUserService
 @inject IDialogService DialogService
 <MudDialog>
@@ -25,7 +26,7 @@
     {
         var result = await NovelUserService.AddNovelUser(NovelId, _usernameTextField?.Text!);
 
-        switch (result)
+        switch (result.Item1)
         {
             case EAddNovelUserResult.Success:
                 DialogService?.ShowMessageBox("Ok", "Success");
@@ -48,7 +49,12 @@
                 break;
         }
         
-        MudDialog.Close(DialogResult.Ok(_usernameTextField?.Text));
+        MudDialog.Close(DialogResult.Ok(new NovelUserDto()
+        {
+            novelId = NovelId,
+            NovelUserId = result.Item2!.Value,
+            userName = _usernameTextField?.Text!
+        }));
     }
 
 }

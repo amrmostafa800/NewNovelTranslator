@@ -66,13 +66,15 @@ public class NovelUserController : ControllerBase
 
         //Add NovelUser
         var addResult = await _novelUserService.AddNovelUser(novelUser.NovelId, novelUser.UserName);
-        switch (addResult)
+        switch (addResult.Item1)
         {
             case EAddNovelUserResult.Success:
-                return new OkResponse
+                return Ok(new
                 {
-                    Description = "Added"
-                };
+                    Status = "Success",
+                    Description = "Added",
+                    Id = addResult.Item2
+                });
             
             case EAddNovelUserResult.AlreadyOwnPermission:
                 return new BadRequestResponse

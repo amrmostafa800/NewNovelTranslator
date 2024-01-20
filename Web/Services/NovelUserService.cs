@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 using Web.Enums;
 using Web.Models;
+using Web.Responses;
 
 namespace Web.Services;
 
@@ -31,7 +32,7 @@ public class NovelUserService
         }
     }
 
-    public async Task<EAddNovelUserResult> AddNovelUser(int novelId, string username)
+    public async Task<Tuple<EAddNovelUserResult,int?>> AddNovelUser(int novelId, string username)
     {
         var json = new
         {
@@ -42,28 +43,28 @@ public class NovelUserService
         try
         {
             var novels = await _client.PostAsJsonAsync($"api/NovelUser",json)!;
-            var responseContent = await novels.Content.ReadAsStringAsync();
+            var responseContent = await novels.Content.ReadFromJsonAsync<AddNovelUserResponse>();
 
-            if (responseContent.Contains("Added"))
+            if (responseContent!.description.Contains("Added"))
             {
-                return EAddNovelUserResult.Success;
+                return new Tuple<EAddNovelUserResult, int?>(EAddNovelUserResult.Success, responseContent.id);
             }
-            if (responseContent.Contains("User Already Have Permission On This Novel"))
+            if (responseContent!.description.Contains("User Already Have Permission On This Novel"))
             {
-                return EAddNovelUserResult.AlreadyOwnPermission;
+                return new Tuple<EAddNovelUserResult, int?>(EAddNovelUserResult.AlreadyOwnPermission,0);
             }
-            if (responseContent.Contains("This Username Not Exist"))
+            if (responseContent!.description.Contains("This Username Not Exist"))
             {
-                return EAddNovelUserResult.UsernameNotExist;
+                return new Tuple<EAddNovelUserResult, int?>(EAddNovelUserResult.UsernameNotExist,0);
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error : {ex.Message}");
-            return EAddNovelUserResult.ServerError;
+            return new Tuple<EAddNovelUserResult, int?>(EAddNovelUserResult.ServerError,0);
         }
 
-        return EAddNovelUserResult.UnknownError;
+        return new Tuple<EAddNovelUserResult, int?>(EAddNovelUserResult.UnknownError,0);
     }
     
     public async Task<ERemoveNovelUser> RemoveNovelUser(int novelId,int novelUserId)

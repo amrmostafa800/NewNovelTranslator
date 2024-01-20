@@ -1,4 +1,7 @@
-﻿namespace WebApi.Responses;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
+
+namespace WebApi.Responses;
 
 public class OkResponse : Response
 {

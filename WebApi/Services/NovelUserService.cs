@@ -37,22 +37,22 @@ public class NovelUserService
         return await _context.NovelUsers.FirstOrDefaultAsync(n => n.NovelId == novelId && n.IsOwner == true);
     }
     
-    public async Task<EAddNovelUserResult> AddNovelUser(int novelId, string username,bool isOwner = false)
+    public async Task<Tuple<EAddNovelUserResult,int>> AddNovelUser(int novelId, string username,bool isOwner = false)
     {
         var userId = await _context.Users.Where(u => u.UserName == username).Select(u => u.Id).FirstOrDefaultAsync();
 
         if (userId == 0)
         {
-            return EAddNovelUserResult.UsernameNotExist;
+            return new Tuple<EAddNovelUserResult, int>(EAddNovelUserResult.UsernameNotExist,0);
         }
         
         return await AddNovelUser(novelId, userId);
     }
     
-    public async Task<EAddNovelUserResult> AddNovelUser(int novelId, int userId, bool isOwner = false)
+    public async Task<Tuple<EAddNovelUserResult,int>> AddNovelUser(int novelId, int userId, bool isOwner = false)
     {
         if (await _novelSharedService.IsUserHavePermissionOnThisNovel(novelId, userId)) 
-            return EAddNovelUserResult.AlreadyOwnPermission; // user already Have Permission in this novel
+            return new Tuple<EAddNovelUserResult, int>(EAddNovelUserResult.AlreadyOwnPermission,0); // user already Have Permission in this novel
         
         var novelUser = new NovelUser
         {
@@ -65,10 +65,10 @@ public class NovelUserService
 
         if (await _context.SaveChangesAsync() != 0)
         {
-            return EAddNovelUserResult.Success;
+            return new Tuple<EAddNovelUserResult, int>(EAddNovelUserResult.Success,novelUser.Id);
         }
         
-        return EAddNovelUserResult.UnknownError;
+        return new Tuple<EAddNovelUserResult, int>(EAddNovelUserResult.UnknownError,0);
     }
     
     public async Task<bool> RemoveNovelUser(int novelId, string username)
