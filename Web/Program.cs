@@ -8,6 +8,8 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
+var apiUrl = builder.Configuration.GetValue<string>("Settings:ApiUrl") ?? throw new InvalidOperationException("Settings 'WebsiteUrl' not found.");
+
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddMudServices();
 builder.Services.AddMudBlazorDialog();
@@ -22,7 +24,7 @@ builder.Services.AddMudBlazorDialog();
 builder.Services
     .AddTransient<CookieHandler>()
     .AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("API"))
-    .AddHttpClient("API", client => client.BaseAddress = new Uri("http://localhost:5000"))
+    .AddHttpClient("API", client => client.BaseAddress = new Uri(apiUrl))
     .AddHttpMessageHandler<CookieHandler>();
 
 builder.Services.AddScoped<NovelService>();
