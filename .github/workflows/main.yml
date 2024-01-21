@@ -21,11 +21,11 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies For Web Api
-      run: DOTNET_CLI_HOME=/tmp dotnet restore "WepApi/WebApi.csproj"
+      run: DOTNET_CLI_HOME=/tmp dotnet restore "WebApi/WebApi.csproj"
     - name: Build Web Api
-      run: DOTNET_CLI_HOME=/tmp dotnet build "WepApi/WebApi.csproj" --no-restore
+      run: DOTNET_CLI_HOME=/tmp dotnet build "WebApi/WebApi.csproj" --no-restore
     - name: Publish Web Api Project
-      run: DOTNET_CLI_HOME=/tmp dotnet publish "WepApi/WebApi.csproj" -c Release  -o /home/novelspace/WebApiApp
+      run: DOTNET_CLI_HOME=/tmp dotnet publish "WebApi/WebApi.csproj" -c Release  -o /home/novelspace/WebApiApp
 
     - name: Restore dependencies For Frontend
       run: DOTNET_CLI_HOME=/tmp dotnet restore "Web/Web.csproj"
