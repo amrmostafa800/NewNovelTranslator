@@ -21,7 +21,9 @@
     async Task Submit()
     {
         var translatedText = await NovelService.Translate(_textBeforeTranslate!.Text, NovelId);
-        _textAfterTranslate!.Text = translatedText;
+        //_textAfterTranslate!.Text = translatedText;
+        await _textAfterTranslate?.SetText(translatedText)!;
+        StateHasChanged();
     }
     void Back() => MudDialog.Cancel();
 }
