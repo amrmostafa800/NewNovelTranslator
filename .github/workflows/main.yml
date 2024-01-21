@@ -1,0 +1,40 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: self-hosted
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies For Web Api
+      run: DOTNET_CLI_HOME=/tmp dotnet restore "WebApi/WebApi.csproj"
+    - name: Build Web Api
+      run: DOTNET_CLI_HOME=/tmp dotnet build "WebApi/WebApi.csproj" --no-restore
+    - name: Stop Application Service
+      run: systemctl stop NovalSpaceApi.service
+    - name: Publish Web Api Project
+      run: DOTNET_CLI_HOME=/tmp dotnet publish "WebApi/WebApi.csproj" -c Release  -o /home/novelspace/WebApiApp
+    - name: Start Application Service
+      run: systemctl start NovalSpaceApi.service
+      
+    - name: Restore dependencies For Frontend
+      run: DOTNET_CLI_HOME=/tmp dotnet restore "Web/Web.csproj"
+    - name: Build Front
+      run: DOTNET_CLI_HOME=/tmp dotnet build "Web/Web.csproj" --no-restore
+    - name: Publish Front
+      run: DOTNET_CLI_HOME=/tmp dotnet publish "Web/Web.csproj" -c Release  -o /home/novelspace/htdocs/novelspace.xyz
+   
