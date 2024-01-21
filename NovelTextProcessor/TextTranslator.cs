@@ -1,8 +1,8 @@
-﻿using System.Net;
-using System.Net.Http.Headers;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using NovelTextProcessor.Dtos;
 using NovelTextProcessor.Helpers;
+using System.Net;
+using System.Net.Http.Headers;
 
 namespace NovelTextProcessor;
 

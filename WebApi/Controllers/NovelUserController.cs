@@ -6,7 +6,6 @@ using WebApi.Enums;
 using WebApi.Extensions;
 using WebApi.Responses;
 using WebApi.Services;
-using WebApi.Validators;
 
 namespace WebApi.Controllers;
 
@@ -26,7 +25,7 @@ public class NovelUserController : ControllerBase
         _novelUserValidator = novelUserValidator;
     }
 
-    
+
     [HttpGet("{novelId}")]
     [Authorize]
     public IActionResult GetNovelUserByNovelId(int novelId)
@@ -75,34 +74,34 @@ public class NovelUserController : ControllerBase
                     Description = "Added",
                     Id = addResult.Item2
                 });
-            
+
             case EAddNovelUserResult.AlreadyOwnPermission:
                 return new BadRequestResponse
                 {
                     Description = "User Already Have Permission On This Novel"
                 };
-            
+
             case EAddNovelUserResult.UsernameNotExist:
                 return new BadRequestResponse
                 {
                     Description = "This Username Not Exist"
                 };
-            
+
             default:
                 return new BadRequestResponse
                 {
                     Description = "Unknown Error"
                 };
         }
-        
+
     }
-    
+
     [HttpDelete("{novelId}/{novelUserId}")]
     [Authorize]
-    public async Task<IActionResult> RemoveNovelUser(int novelId,int novelUserId)
+    public async Task<IActionResult> RemoveNovelUser(int novelId, int novelUserId)
     {
         var novelUser = await _novelUserService.GetNovelUserOwnerByNovelId(novelId);
-        
+
         if (novelUser?.UserId != User.GetCurrentUserId()) //check if current User Have Permission To Delete This NovelUser
         {
             return new BadRequestResponse
@@ -121,31 +120,31 @@ public class NovelUserController : ControllerBase
                 {
                     Description = "Removed"
                 };
-            
+
             case ERemoveNovelUserResult.AlreadyDontOwnPermission:
                 return new BadRequestResponse
                 {
                     Description = "User Already Dont Have Permission On This Novel"
                 };
-            
+
             case ERemoveNovelUserResult.OwnerTryRemoveItself:
                 return new BadRequestResponse
                 {
                     Description = "You Cant Remove Yourself"
                 };
-            
+
             case ERemoveNovelUserResult.ThisNovelUserIdNotExist:
                 return new BadRequestResponse
                 {
                     Description = "There is No NovelUser With This Id"
                 };
-            
+
             default:
                 return new BadRequestResponse
                 {
                     Description = "Unknown Error"
                 };
         }
-        
+
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Newtonsoft.Json.Linq;
 using Web.Enums;
 using Web.Models;
 
@@ -21,10 +19,10 @@ public class NovelService
         try
         {
             var novels = await _client.GetFromJsonAsync<List<NovelDto>>("api/Novel")!;
-            
+
             if (novels != null)
                 return novels;
-            
+
             return new List<NovelDto>();
         }
         catch (Exception ex)
@@ -41,14 +39,14 @@ public class NovelService
             novelName
         };
 
-        var response = await _client.PostAsJsonAsync("api/Novel",addNovel)!;
-        
+        var response = await _client.PostAsJsonAsync("api/Novel", addNovel)!;
+
         if (response.IsSuccessStatusCode)
             return ENovelResult.Success;
-        
+
         if (response.StatusCode == HttpStatusCode.Unauthorized)
             return ENovelResult.AuthRequired;
-        
+
         return ENovelResult.ServerError;
     }
 
@@ -57,10 +55,10 @@ public class NovelService
 
         var response = await _client.DeleteAsync($"api/Novel/{novelId}")!;
         var responseContent = await response.Content.ReadAsStringAsync();
-        
+
         if (response.IsSuccessStatusCode)
             return ENovelResult.Success;
-        
+
         if (response.StatusCode == HttpStatusCode.Unauthorized)
             return ENovelResult.AuthRequired;
 
@@ -68,25 +66,25 @@ public class NovelService
         {
             return ENovelResult.NotExist;
         }
-        
+
         if (responseContent.Contains("You Cant Delete Novel Not Created By You"))
         {
             return ENovelResult.DontOwnPermission;
         }
-        
+
         return ENovelResult.ServerError;
     }
-    
-    public async Task<string> Translate(string text,int novelId)
+
+    public async Task<string> Translate(string text, int novelId)
     {
         var json = new
         {
             text
         };
-        
+
         try
         {
-            var response = await _client.PostAsJsonAsync($"api/Translate/{novelId}",json)!;
+            var response = await _client.PostAsJsonAsync($"api/Translate/{novelId}", json)!;
             if (response.IsSuccessStatusCode)
             {
                 return await response.Content.ReadAsStringAsync();

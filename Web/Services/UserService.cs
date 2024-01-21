@@ -13,7 +13,7 @@ public class UserService
     }
 
     public string CurrentUsername { get; set; } = string.Empty;
-    
+
     public event Action<string>? OnLogin;
     public event EventHandler? OnLogout;
 
@@ -74,7 +74,7 @@ public class UserService
 
         return false;
     }
-    
+
     public async Task<string> GetCurrentEmail()
     {
         var response = await _client.GetAsync("manage/info");

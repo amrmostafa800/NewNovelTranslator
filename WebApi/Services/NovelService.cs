@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebApi.Data;
+﻿using WebApi.Data;
 using WebApi.DTOs;
 using WebApi.Models;
 
@@ -19,16 +18,16 @@ public class NovelService
     public List<NovelDto> GetAllNovels()
     {
         var linqQuery = from novel in _context.Novels
-            join novelUser in _context.NovelUsers on novel.Id equals novelUser.NovelId
-            where novelUser.IsOwner == true
-            select new NovelDto
-            {
-                Id = novel.Id,
-                UserId = novelUser.UserId,
-                UserName = novelUser.User.UserName,
-                Name = novel.NovelName
-            };
-        
+                        join novelUser in _context.NovelUsers on novel.Id equals novelUser.NovelId
+                        where novelUser.IsOwner == true
+                        select new NovelDto
+                        {
+                            Id = novel.Id,
+                            UserId = novelUser.UserId,
+                            UserName = novelUser.User.UserName,
+                            Name = novel.NovelName
+                        };
+
         return linqQuery.ToList();
     }
 
@@ -63,7 +62,7 @@ public class NovelService
         {
             return true;
         }
-        
+
         return false;
     }
 
@@ -74,12 +73,12 @@ public class NovelService
         if (_CheckIfNovelAlreadyExistWithThisUser(novelName, userIdWhoCreateNovel))
         {
             return 0; // mean user already have novel with this name
-        } 
+        }
         //Add Novel
         var novel = await _AddNovel(novelName);
 
         //Add NovelUser as Owner
-        await _novelUserService.AddNovelUser(novel.Id, userIdWhoCreateNovel,true);
+        await _novelUserService.AddNovelUser(novel.Id, userIdWhoCreateNovel, true);
         return novel.Id;
     }
 
@@ -87,8 +86,8 @@ public class NovelService
     {
         //Try Get Novel
         var novel = _context.Novels.FirstOrDefault(n => n.Id == id);
-        
-        if (novel == null) 
+
+        if (novel == null)
             return false;
 
         _context.Novels.Remove(novel); // Bycouse Cascade Delete Enabled Remove Novel Will Remove NovelUsers Too

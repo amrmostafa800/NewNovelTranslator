@@ -1,12 +1,12 @@
-﻿using System.Security.Claims;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NovelTextProcessor;
+using System.Security.Claims;
 using WebApi.DTOs;
+using WebApi.Extensions;
 using WebApi.Responses;
 using WebApi.Services;
-using WebApi.Extensions;
 
 namespace WebApi.Controllers;
 
@@ -52,10 +52,10 @@ public class EntityNameController : ControllerBase //TDO use IDataProtectionProv
         {
             return BadRequest(validationResult.Errors);
         }
-        
+
         //Check if user have acsses on this novel or not
         var novelUserIdOfThisEntity = _novelService.GetById(entityName.NovelId)!.UserId;
-        
+
         if (!_IsUserHaveAccess(novelUserIdOfThisEntity))
         {
             return new BadRequestResponse
@@ -66,10 +66,10 @@ public class EntityNameController : ControllerBase //TDO use IDataProtectionProv
 
         //Add To database
         var entityNamesAddResult = await _entityNameService.AddManyEntityNames(entityName);
-        
+
         if (entityNamesAddResult) // If Add Not Failed
             return NoContent();
-        
+
         return new BadRequestResponse
         {
             Description = "One Of EntityNames Or More Exist"
@@ -91,9 +91,9 @@ public class EntityNameController : ControllerBase //TDO use IDataProtectionProv
                 Description = "You Dont Have Permission On This Novel"
             };
         }
-        
+
         //Update EntityName
-        var result = await _entityNameService.UpdateEntityName(id, entityNameDetails.EnglishName, entityNameDetails.ArabicName ,entityNameDetails.Gender);
+        var result = await _entityNameService.UpdateEntityName(id, entityNameDetails.EnglishName, entityNameDetails.ArabicName, entityNameDetails.Gender);
 
         if (result)
         {
@@ -102,7 +102,7 @@ public class EntityNameController : ControllerBase //TDO use IDataProtectionProv
                 Description = "Edited"
             };
         }
-        
+
         return new BadRequestResponse()
         {
             Description = "Unknown Error"
@@ -139,12 +139,12 @@ public class EntityNameController : ControllerBase //TDO use IDataProtectionProv
     private bool _IsUserHaveAccess(int novelUserId)
     {
         var userId = _GetCurrentUserId();
-        
+
         if (userId != novelUserId)
         {
             return false;
         }
-        
+
         return true;
     }
 

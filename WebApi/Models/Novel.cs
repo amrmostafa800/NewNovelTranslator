@@ -6,7 +6,8 @@ namespace WebApi.Models;
 public class Novel
 {
     public int Id { get; set; }
-    
+
     [Column(TypeName = "VARCHAR")]
     [MaxLength(256)]
-    public required string NovelName { get; set; } }
+    public required string NovelName { get; set; }
+}

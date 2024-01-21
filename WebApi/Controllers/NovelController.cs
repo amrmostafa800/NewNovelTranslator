@@ -1,11 +1,11 @@
-﻿using System.Security.Claims;
-using FluentValidation;
+﻿using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using WebApi.DTOs;
+using WebApi.Extensions;
 using WebApi.Responses;
 using WebApi.Services;
-using WebApi.Extensions;
 
 namespace WebApi.Controllers;
 
@@ -44,7 +44,7 @@ public class NovelController : ControllerBase //TDO use DataProtectionProvider t
                 Description = "Novel Id Not Exist"
             };
         }
-        
+
         return Ok(new
         {
             novel.Id,
@@ -68,7 +68,7 @@ public class NovelController : ControllerBase //TDO use DataProtectionProvider t
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value.ToInt();
 
         var novelUserId = await _novelService.AddNovel(novelDto.NovelName, userId);
-        
+
         if (novelUserId == 0)
         {
             return new BadRequestResponse
@@ -107,7 +107,7 @@ public class NovelController : ControllerBase //TDO use DataProtectionProvider t
         }
 
         var isDeleted = await _novelService.DeleteNovel(id);
-        
+
         if (!isDeleted)
         {
             return new BadRequestResponse
@@ -115,7 +115,7 @@ public class NovelController : ControllerBase //TDO use DataProtectionProvider t
                 Description = "Unknown Error"
             };
         }
-        
+
         return new OkResponse
         {
             Description = "Deleted"
@@ -126,7 +126,7 @@ public class NovelController : ControllerBase //TDO use DataProtectionProvider t
     public async Task<IActionResult> CheckIfOwnPermissionOnNovel(CheckForPermissionDto checkForPermission)
     {
         var result = await _novelSharedService.IsUserHavePermissionOnThisNovel(checkForPermission.NovelId, checkForPermission.UserId);
-        
+
         if (result)
         {
             return new OkResponse

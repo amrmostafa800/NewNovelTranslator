@@ -1,6 +1,6 @@
-﻿using System.Text;
-using NovelTextProcessor.Dtos;
+﻿using NovelTextProcessor.Dtos;
 using NovelTextProcessor.Extensions;
+using System.Text;
 
 namespace NovelTextProcessor;
 
@@ -35,13 +35,13 @@ public class Processor
     private void _RestoreOriginalNames()
     {
         for (var i = 0; i < listOfSpanAndEntityNames.Count; i++)
-        for (var t = 0; t < listOfSpanAndEntityNames[i].EntityNames.Count; t++)
-            if (listOfSpanAndEntityNames[i].EntityNames[t].Gender == 'M')
-                listOfSpanAndEntityNames[i].Span = listOfSpanAndEntityNames[i].Span
-                    .ReplaceFirst(FixedArMaleName, listOfSpanAndEntityNames[i].EntityNames[t].ArabicName);
-            else
-                listOfSpanAndEntityNames[i].Span = listOfSpanAndEntityNames[i].Span
-                    .ReplaceFirst(FixedArFemaleName, listOfSpanAndEntityNames[i].EntityNames[t].ArabicName);
+            for (var t = 0; t < listOfSpanAndEntityNames[i].EntityNames.Count; t++)
+                if (listOfSpanAndEntityNames[i].EntityNames[t].Gender == 'M')
+                    listOfSpanAndEntityNames[i].Span = listOfSpanAndEntityNames[i].Span
+                        .ReplaceFirst(FixedArMaleName, listOfSpanAndEntityNames[i].EntityNames[t].ArabicName);
+                else
+                    listOfSpanAndEntityNames[i].Span = listOfSpanAndEntityNames[i].Span
+                        .ReplaceFirst(FixedArFemaleName, listOfSpanAndEntityNames[i].EntityNames[t].ArabicName);
     }
 
     private async Task TranslateAllSpansAsync()

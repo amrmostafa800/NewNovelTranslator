@@ -21,7 +21,7 @@ public class TranslateController : ControllerBase
     [HttpPost("{novelId}")]
     public async Task<IActionResult> Translate(int novelId, [FromBody] TranslateDto data)
     {
-        var entityNamesOfThisNovel = _entityNameService.GetEntityNamesByNovelId(novelId,true);
+        var entityNamesOfThisNovel = _entityNameService.GetEntityNamesByNovelId(novelId, true);
 
         if (entityNamesOfThisNovel.IsNullOrEmpty())
         {
@@ -31,7 +31,7 @@ public class TranslateController : ControllerBase
         var entityNamesOfThisNovelAsNovelTextProcessor = EntityNameMapper
             .ConvertFromModelEntityNameArrayToNovelTextProcessorEntityNameArray(entityNamesOfThisNovel.ToArray())
             .ToArray();
-        
+
         var processor = new Processor(data.Text, entityNamesOfThisNovelAsNovelTextProcessor);
         await processor.RunAsync();
         return Ok(processor.GetResult());
