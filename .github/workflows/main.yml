@@ -24,13 +24,17 @@ jobs:
       run: DOTNET_CLI_HOME=/tmp dotnet restore "WebApi/WebApi.csproj"
     - name: Build Web Api
       run: DOTNET_CLI_HOME=/tmp dotnet build "WebApi/WebApi.csproj" --no-restore
+    - name: Stop Application Service
+      run: systemctl stop NovalSpaceApi.service
     - name: Publish Web Api Project
       run: DOTNET_CLI_HOME=/tmp dotnet publish "WebApi/WebApi.csproj" -c Release  -o /home/novelspace/WebApiApp
-
+    - name: Start Application Service
+      run: systemctl start NovalSpaceApi.service
+      
     - name: Restore dependencies For Frontend
       run: DOTNET_CLI_HOME=/tmp dotnet restore "Web/Web.csproj"
     - name: Build Front
       run: DOTNET_CLI_HOME=/tmp dotnet build "Web/Web.csproj" --no-restore
     - name: Publish Front
-      run: DOTNET_CLI_HOME=/tmp dotnet publish "Web/Web.csproj" -c Release  -o /home/novelspace-front/htdocs/front.novelspace.xyz
+      run: DOTNET_CLI_HOME=/tmp dotnet publish "Web/Web.csproj" -c Release  -o /home/novelspace/htdocs/novelspace.xyz
    
