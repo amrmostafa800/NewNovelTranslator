@@ -32,5 +32,5 @@ jobs:
     - name: Build Front
       run: DOTNET_CLI_HOME=/tmp dotnet build "Web/Web.csproj" --no-restore
     - name: Publish Front
-      run: DOTNET_CLI_HOME=/tmp dotnet publish "Web/Web.csproj" -c Release  -o /home/novelspace/FrontApp
+      run: DOTNET_CLI_HOME=/tmp dotnet publish "Web/Web.csproj" -c Release  -o /home/novelspace-front/htdocs/front.novelspace.xyz
    
