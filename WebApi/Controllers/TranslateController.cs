@@ -21,11 +21,12 @@ public class TranslateController : ControllerBase
     [HttpPost("{novelId}")]
     public async Task<IActionResult> Translate(int novelId, [FromBody] TranslateDto data)
     {
+        //Can Check Here If Novel Exist or Not But This Will Not Happen If Person Call Api Using Website Normal
         var entityNamesOfThisNovel = _entityNameService.GetEntityNamesByNovelId(novelId, true);
-
-        if (entityNamesOfThisNovel.IsNullOrEmpty())
+        
+        if (entityNamesOfThisNovel.Count == 0)
         {
-            return BadRequest("Novel Id Not Exist");
+            return BadRequest("Please Add At Last One Entity Name Before Translate");
         }
 
         var entityNamesOfThisNovelAsNovelTextProcessor = EntityNameMapper

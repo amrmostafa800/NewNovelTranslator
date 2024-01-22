@@ -1,5 +1,6 @@
 ﻿@using Web.Services
 @inject NovelService NovelService
+@inject IDialogService DialogService
 <MudDialog>
     <DialogContent>
         <MudButton FullWidth="true" OnClick="@Back">Back</MudButton>
@@ -21,6 +22,13 @@
     async Task Submit()
     {
         var translatedText = await NovelService.Translate(_textBeforeTranslate!.Text, NovelId);
+
+        if (translatedText == "Please Add At Last One Entity Name Before Translate")
+        {
+            await DialogService.ShowMessageBox("Error", "Please Add At Last One Entity Name Before Translate");
+            return;
+        }
+        
         //_textAfterTranslate!.Text = translatedText;
         await _textAfterTranslate?.SetText(translatedText)!;
         StateHasChanged();

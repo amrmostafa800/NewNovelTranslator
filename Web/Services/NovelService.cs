@@ -85,9 +85,15 @@ public class NovelService
         try
         {
             var response = await _client.PostAsJsonAsync($"api/Translate/{novelId}", json)!;
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            if (responseContent == "Please Add At Last One Entity Name Before Translate")
+            {
+                return "Please Add At Last One Entity Name Before Translate";
+            }
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadAsStringAsync();
+                return responseContent;
             }
         }
         catch (Exception ex)
