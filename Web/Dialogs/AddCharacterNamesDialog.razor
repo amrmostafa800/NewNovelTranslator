@@ -62,7 +62,10 @@
             case EEntityNameResult.Success:
                 await DialogService.ShowMessageBox("Success", "Character Names Has Been Added");
                 break;
-                case EEntityNameResult.AuthRequired:
+            case EEntityNameResult.NoPermission:
+                await DialogService.ShowMessageBox("Error", "You Dont Have Permission On This Novel");
+                break;
+           case EEntityNameResult.AuthRequired:
                 await DialogService.ShowMessageBox("Auth Required", "Please Login First");
                 break;
             case EEntityNameResult.IsExist:

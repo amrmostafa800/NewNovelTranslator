@@ -92,7 +92,7 @@
         //Call Update API
         var result = await CharacterNameService.UpdateEntityNameById(characterName);
 
-        await ShowMasseageBoxForResult(result);
+        await ShowMassageBoxForResult(result);
     }
 
     private async Task RemoveCharacterName(CharacterNameDto item)
@@ -100,13 +100,13 @@
         //Remove From Database
         var result = await CharacterNameService.RemoveEntityNameById(item.Id);
 
-        await ShowMasseageBoxForResult(result);
+        await ShowMassageBoxForResult(result);
 
         //Remove From Table
         _characterNames?.Remove(item);
     }
 
-    private async Task ShowMasseageBoxForResult(EEntityNameResult result)
+    private async Task ShowMassageBoxForResult(EEntityNameResult result)
     {
         switch (result)
         {

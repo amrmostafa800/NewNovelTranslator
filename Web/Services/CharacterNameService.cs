@@ -32,6 +32,14 @@ public class CharacterNameService
             {
                 return EEntityNameResult.Success;
             }
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                return EEntityNameResult.AuthRequired;
+            }
+            if (responseResult.Contains("You Dont Have Permission On This Novel"))
+            {
+                return EEntityNameResult.NoPermission;
+            }
             if (responseResult.Contains("One Of EntityNames Or More Exist"))
             {
                 return EEntityNameResult.IsExist;
@@ -43,7 +51,7 @@ public class CharacterNameService
             return EEntityNameResult.ServerError;
         }
 
-        return EEntityNameResult.AuthRequired;
+        return EEntityNameResult.ServerError;
     }
 
     public async Task<EEntityNameResult> RemoveEntityNameById(int entityNameId)
