@@ -8,7 +8,5 @@ NovelTextProcessor :
 Web : Frontend Of Website
 
 WebApi : Backend Of Website
-
-Website Is Live : https://novelspace.xyz/
 --------------------------------------------------
 Please Open Issue If Found Any Bug
