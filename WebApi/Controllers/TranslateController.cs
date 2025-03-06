@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using NovelTextProcessor;
 using WebApi.DTOs;
 using WebApi.ObjectsMapper;
@@ -23,7 +22,7 @@ public class TranslateController : ControllerBase
     {
         //Can Check Here If Novel Exist or Not But This Will Not Happen If Person Call Api Using Website Normal
         var entityNamesOfThisNovel = _entityNameService.GetEntityNamesByNovelId(novelId, true);
-        
+
         if (entityNamesOfThisNovel.Count == 0)
         {
             return BadRequest("Please Add At Last One Entity Name Before Translate");
@@ -35,6 +34,6 @@ public class TranslateController : ControllerBase
 
         var processor = new Processor(data.Text, entityNamesOfThisNovelAsNovelTextProcessor);
         await processor.RunAsync();
-        return Ok(processor.GetResult());
+        return Ok(processor.GetResult().Replace("لله ", "***").Replace("الله", "***")); // TDO : need edit soon
     }
 }
